@@ -1,0 +1,24 @@
+{
+  "name": "ocean-nfc-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ocean-nfc/ocean-nfc-server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ocean-nfc/ocean-nfc-server/issues"
+  },
+  "homepage": "https://github.com/ocean-nfc/ocean-nfc-server#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
