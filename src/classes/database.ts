@@ -176,6 +176,13 @@ export class Database {
     await this.run("DELETE FROM db WHERE (clientId=?)", [clientId]);
   }
 
+  /**
+   * Returns a list of all clients
+   */
+  public getAllClients() {
+    return this.all("SELECT * FROM db");
+  }
+
   private async getAllClientsByProperty(propertyName, propertyValue) {
     const users = await this.all(`SELECT * FROM db WHERE (${propertyName}=?)`, [
       propertyValue

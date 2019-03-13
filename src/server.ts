@@ -13,6 +13,7 @@ import { updateRfid } from "./routes/update-rfid";
 import { updatePin } from "./routes/update-pin";
 import { updateCardNumber } from "./routes/update-card-number";
 import { removeCard } from "./routes/remove-card";
+import { listAllClients } from "./routes/list-all-clients";
 
 export class Server {
   private app: express.Application;
@@ -34,6 +35,7 @@ export class Server {
     this.app.get("/get-client-id-from-rfid", getClientIdFromRfid);
     this.app.get("/get-client-id-from-card-number", getClientIdFromCardNumber);
     this.app.get("/get-log", getLog);
+    this.app.get("/list-all-clients", listAllClients)
 
     this.app.post("/verify-pin", verifyPin);
     this.app.post("/add-card", addCard);
