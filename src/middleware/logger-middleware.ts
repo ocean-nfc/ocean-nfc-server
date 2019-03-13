@@ -19,6 +19,7 @@ export const loggerMiddleware: express.RequestHandler = (req: express.Request, r
 
   console.log(logItem);
   // TODO: Save log item to log database
+  //addToLog() 
 
   next();
 }
