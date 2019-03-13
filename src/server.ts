@@ -1,3 +1,4 @@
+import { getLog } from './routes/get-log';
 //test
 import { authMiddleware } from './middleware/auth-middleware';
 import * as express from "express";
@@ -24,6 +25,7 @@ export class Server {
     });
     
     this.app.get("/get-client-id", getClientId);
+    this.app.get("/get-log", getLog);
   }
 
   registerMiddleware() {

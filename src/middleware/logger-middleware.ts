@@ -1,3 +1,4 @@
+import { LogItem } from './../classes/log';
 import * as express from "express";
 
 /**
@@ -20,13 +21,4 @@ export const loggerMiddleware: express.RequestHandler = (req: express.Request, r
   // TODO: Save log item to log database
 
   next();
-}
-
-interface LogItem {
-  time: Date;
-  parameters: any;
-  ip: any;
-  url: string;
-  method: string;
-  headers: any;
 }

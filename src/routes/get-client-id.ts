@@ -1,3 +1,4 @@
+import { ClientCache } from './../classes/client-cache';
 //import { CardIdNotFoundException } from './../exceptions';
 import * as express from "express";
 import { ClientIdNotFoundException } from "../exceptions";
@@ -14,8 +15,11 @@ export const getClientId: express.RequestHandler = async (req: express.Request, 
     return next(new ClientIdNotFoundException());
   }
 
+  const cache = ClientCache.getInstance();
+  const clientId = await cache.getClientId(cardId);
+
   res.json({
     cardId: req.query.cardId,
-    clientId: await new Promise(resolve => setTimeout(() => resolve("1234"), 1000)),
+    clientId: clientId,
   });
 }
