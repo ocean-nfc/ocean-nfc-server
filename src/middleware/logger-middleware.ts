@@ -1,3 +1,4 @@
+import { Database } from './../classes/database';
 import * as express from "express";
 
 /**
@@ -7,26 +8,19 @@ import * as express from "express";
  * @param next 
  */
 export const loggerMiddleware: express.RequestHandler = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  const logItem: LogItem = {
-    time: new Date(),
-    parameters: req.query,
-    ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-    url: req.originalUrl,
-    method: req.method,
-    headers: req.headers,
-  };
+  const logItem = [
+    new Date().getTime(),
+    res.statusCode,
+    req.method,
+    req.originalUrl,
+    JSON.stringify(req.query),
+    req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+  ];
 
-  console.log(logItem);
-  // TODO: Save log item to log database
+  console.log(logItem.join(" "));
+  
+  const db = Database.getInstance();
+  db.addLogItem(logItem[0], logItem[1], logItem[2], logItem[3], logItem[4].toString(), logItem[5]);
 
   next();
-}
-
-interface LogItem {
-  time: Date;
-  parameters: any;
-  ip: any;
-  url: string;
-  method: string;
-  headers: any;
 }
