@@ -15,12 +15,12 @@ export const loggerMiddleware: express.RequestHandler = (req: express.Request, r
     req.originalUrl,
     JSON.stringify(req.query),
     req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-  ]
+  ];
 
-  console.log(logItem);
+  console.log(logItem.join(" "));
   
   const db = Database.getInstance();
-  db.run("INSERT INTO log VALUES (?, ?, ?, ?, ?, ?)", logItem);
+  db.addLogItem(logItem[0], logItem[1], logItem[2], logItem[3], logItem[4].toString(), logItem[5]);
 
   next();
 }
