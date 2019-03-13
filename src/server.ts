@@ -45,7 +45,7 @@ export class Server {
 
   registerMiddleware() {
     this.app.use(loggerMiddleware);
-    this.app.use(authMiddleware);
+    // this.app.use(authMiddleware);
   }
 
   listen() {
