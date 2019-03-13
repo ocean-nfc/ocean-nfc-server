@@ -1,9 +1,10 @@
 export class Exception {
-  error: boolean = true;
   message: string = "UNKNOWN_ERROR";
   code: number = HTTP_CODE.UNKNOWN;
   toString() {
-    return JSON.stringify(this);
+    return JSON.stringify({
+      message: this.message
+    });
   }
 }
 
@@ -12,8 +13,8 @@ export class AuthException extends Exception {
   code: number = HTTP_CODE.AUTHENTICATION;
 }
 
-export class CardIdNotSuppliedException extends Exception {
-  message: string = "CARD_ID_NOT_SUPPLIED";
+export class NotAllParamsSuppliedException extends Exception {
+  message: string = "PARAMS_NOT_SUPPLIED";
   code: number = HTTP_CODE.BAD_REQUEST;
 }
 

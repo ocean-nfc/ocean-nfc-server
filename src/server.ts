@@ -1,11 +1,17 @@
+import { addCard } from './routes/add-card';
+import { getClientIdFromCardNumber } from './routes/get-client-id-from-card-number';
+import { getClientIdFromRfid } from './routes/get-client-id-from-rfid';
 import { getLog } from './routes/get-log';
 //test
 import { authMiddleware } from './middleware/auth-middleware';
 import * as express from "express";
 import { config } from "./config";
-import { getClientId } from "./routes/get-client-id";
 import { errorHandler } from './middleware/error-handler';
 import { loggerMiddleware } from './middleware/logger-middleware';
+import { verifyPin } from './routes/verify-pin';
+import { updateRfid } from './routes/update-rfid';
+import { updatePin } from './routes/update-pin';
+import { updateCardNumber } from './routes/update-card-number';
 
 export class Server {  
   private app: express.Application;
@@ -24,8 +30,16 @@ export class Server {
       res.send("Ocean NFC system");
     });
     
-    this.app.get("/get-client-id", getClientId);
+    this.app.get("/get-client-id-from-rfid", getClientIdFromRfid);
+    this.app.get("/get-client-id-from-card-number", getClientIdFromCardNumber);
     this.app.get("/get-log", getLog);
+    
+    this.app.post("/verify-pin", verifyPin);
+    this.app.post("/add-card", addCard);
+    this.app.post("/update-rfid", updateRfid);
+    this.app.post("/update-pin", updatePin);
+    this.app.post("/update-card-number", updateCardNumber);
+
   }
 
   registerMiddleware() {
