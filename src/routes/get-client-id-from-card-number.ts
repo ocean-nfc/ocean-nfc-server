@@ -1,4 +1,5 @@
-import { NotAllParamsSuppliedException } from './../exceptions';
+import { Database } from './../classes/database';
+import { NotAllParamsSuppliedException, Exception } from './../exceptions';
 import * as express from "express";
 import { ClientIdNotFoundException } from "../exceptions";
 
@@ -8,9 +9,18 @@ export const getClientIdFromCardNumber: express.RequestHandler = async (req: exp
     return next(new NotAllParamsSuppliedException());
   }
 
-  // if client not found next(new ClientIdNotFoundException())
+  const db = Database.getInstance();
 
-  res.json({
-    clientId: null,
-  });
+  try {
+    const users = await db.all("SELECT * FROM db WHERE (cardNumber=?)", [cardNumber]);
+    if (users.length === 0) {
+      return next(new ClientIdNotFoundException());
+    }
+    res.json({
+      clientId: users[0].clientId
+    });
+  } catch (e) {
+    console.error("error:", e);
+    return next(new Exception());
+  }
 }
