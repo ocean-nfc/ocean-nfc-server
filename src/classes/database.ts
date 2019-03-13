@@ -61,7 +61,7 @@ export class Database {
   private initialiseLogTable(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.db.run(
-        "CREATE TABLE IF NOT EXISTS log (date INT, method TEXT, url TEXT, parameters TEXT, ip TEXT, responseTime INT, response TEXT)",
+        "CREATE TABLE IF NOT EXISTS log (date INT, statusCode INT, method TEXT, url TEXT, parameters TEXT, ip TEXT)",
         (res, err) => {
           if (err) reject(err);
           else resolve();
