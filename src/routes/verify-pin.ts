@@ -10,8 +10,6 @@ export const verifyPin: express.RequestHandler = async (req: express.Request, re
     return next(new NotAllParamsSuppliedException());
   }
 
-  // if the user doesn't exist next(new ClientNotFoundException())
-
   const db = Database.getInstance();
 
   try {
