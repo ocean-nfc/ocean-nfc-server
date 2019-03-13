@@ -1,6 +1,8 @@
+import { authMiddleware } from './middleware/auth-middleware';
 import * as express from "express";
 import { config } from "./config";
 import { getClientId } from "./routes/get-client-id";
+import { errorHandler } from './middleware/error-handler';
 
 export class Server {  
   private app: express.Application;
@@ -10,6 +12,7 @@ export class Server {
 
     this.registerMiddleware();
     this.registerRoutes();
+    this.app.use(errorHandler);
     this.listen();
   }
 
@@ -22,7 +25,7 @@ export class Server {
   }
 
   registerMiddleware() {
-    // TODO: middleware
+    this.app.use(authMiddleware);
   }
 
   listen() {
