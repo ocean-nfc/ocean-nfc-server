@@ -1,4 +1,5 @@
-import { NotAllParamsSuppliedException } from './../exceptions';
+import { Database } from './../classes/database';
+import { NotAllParamsSuppliedException, Exception } from './../exceptions';
 import * as express from "express";
 
 export const getLog: express.RequestHandler = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -8,10 +9,28 @@ export const getLog: express.RequestHandler = async (req: express.Request, res: 
     return next(new NotAllParamsSuppliedException());
   }
 
-  startDate = new Date(startDate);
-  endDate = new Date(endDate);
+  // try parse the dates. If they are invalid, then we simply
+  try {
+    startDate = parseInt(startDate) * 1000;
+    endDate = parseInt(endDate) * 1000;
+  } catch (e) {
+    console.error(e, "invalid date");
+    return next(new NotAllParamsSuppliedException());
+  }
 
-  // check if dates are ok and if not, respond with notallparamssuppliedexception
+  // get the rows from the database
+  const db: Database = Database.getInstance();
 
-  res.json([]);
+  try {
+    console.log("getting log");
+    const log = await db.all("SELECT * FROM log WHERE (date >= ? AND date <= ?)", [startDate, endDate]);
+    console.log("got log");
+    console.log("got log", log);
+    res.json(log);
+  } catch (e) {
+    console.error("error:");
+    console.error(e);
+    next(new Exception());
+  }
+
 }

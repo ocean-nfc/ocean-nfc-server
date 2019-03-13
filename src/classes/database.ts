@@ -79,9 +79,9 @@ export class Database {
   public run(sqlQuery: string, params?: any): Promise<any> {
     return new Promise(async (resolve, reject) => {
       await this.ready();
-      this.db.run(sqlQuery, params, (res, err) => {
+      this.db.run(sqlQuery, params, (err) => {
         if (err) reject(err);
-        else resolve(res);
+        else resolve();
       });
     });
   }
@@ -95,7 +95,7 @@ export class Database {
   public all(sqlQuery: string, params?: any): Promise<any> {
     return new Promise(async (resolve, reject) => {
       await this.ready();
-      this.db.all(sqlQuery, params, (res, err) => {
+      this.db.all(sqlQuery, params, (err, res) => {
         if (err) reject(err);
         else resolve(res);
       });
