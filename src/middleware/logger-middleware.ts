@@ -1,4 +1,4 @@
-import { LogItem } from './../classes/log';
+import { Database } from './../classes/database';
 import * as express from "express";
 
 /**
@@ -8,17 +8,19 @@ import * as express from "express";
  * @param next 
  */
 export const loggerMiddleware: express.RequestHandler = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  const logItem: LogItem = {
-    time: new Date(),
-    parameters: req.query,
-    ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-    url: req.originalUrl,
-    method: req.method,
-    headers: req.headers,
-  };
+  const logItem = [
+    new Date().getTime(),
+    res.statusCode,
+    req.method,
+    req.originalUrl,
+    JSON.stringify(req.query),
+    req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+  ]
 
   console.log(logItem);
-  // TODO: Save log item to log database
+  
+  const db = Database.getInstance();
+  db.run("INSERT INTO log VALUES (?, ?, ?, ?, ?, ?)", logItem);
 
   next();
 }

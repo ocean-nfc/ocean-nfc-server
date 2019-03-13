@@ -1,13 +1,13 @@
+import { loggerMiddleware } from './middleware/logger-middleware';
+import * as express from "express";
+
 import { addCard } from './routes/add-card';
 import { getClientIdFromCardNumber } from './routes/get-client-id-from-card-number';
 import { getClientIdFromRfid } from './routes/get-client-id-from-rfid';
 import { getLog } from './routes/get-log';
-//test
 import { authMiddleware } from './middleware/auth-middleware';
-import * as express from "express";
 import { config } from "./config";
 import { errorHandler } from './middleware/error-handler';
-import { loggerMiddleware } from './middleware/logger-middleware';
 import { verifyPin } from './routes/verify-pin';
 import { updateRfid } from './routes/update-rfid';
 import { updatePin } from './routes/update-pin';
