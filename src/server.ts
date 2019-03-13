@@ -3,6 +3,7 @@ import * as express from "express";
 import { config } from "./config";
 import { getClientId } from "./routes/get-client-id";
 import { errorHandler } from './middleware/error-handler';
+import { loggerMiddleware } from './middleware/logger-middleware';
 
 export class Server {  
   private app: express.Application;
@@ -25,6 +26,7 @@ export class Server {
   }
 
   registerMiddleware() {
+    this.app.use(loggerMiddleware);
     this.app.use(authMiddleware);
   }
 
