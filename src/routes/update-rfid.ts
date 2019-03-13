@@ -1,4 +1,5 @@
-import { NotAllParamsSuppliedException } from './../exceptions';
+import { Database } from './../classes/database';
+import { NotAllParamsSuppliedException, ClientIdNotFoundException, Exception } from './../exceptions';
 import * as express from "express";
 
 export const updateRfid: express.RequestHandler = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -8,9 +9,20 @@ export const updateRfid: express.RequestHandler = async (req: express.Request, r
     return next(new NotAllParamsSuppliedException());
   }
 
-  // if couldn't find client next(new ClientIdNotFoundException())
+  const db = Database.getInstance();
 
-  // update the pin
-  
-  res.json();
+  try {
+    try {
+      await db.updateClientRfid(clientId, rfid);
+      res.json();
+    } catch (e) {
+      if (e instanceof ClientIdNotFoundException) {
+        return next(e);
+      }
+      throw e;
+    }
+  } catch (e) {
+    console.error(e);
+    return next(new Exception());
+  }
 }

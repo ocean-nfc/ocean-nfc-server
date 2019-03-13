@@ -12,13 +12,18 @@ export const getClientIdFromRfid: express.RequestHandler = async (req: express.R
   const db = Database.getInstance();
 
   try {
-    const users = await db.all("SELECT * FROM db WHERE (rfid=?)", [rfid]);
-    if (users.length === 0) {
-      return next(new ClientIdNotFoundException());
+    try {
+      const id = await db.getClientIdByRfid(rfid);
+      res.json({
+        clientId: id
+      });
     }
-    res.json({
-      clientId: users[0].clientId
-    });
+    catch (e) {
+      if (e instanceof ClientIdNotFoundException) {
+        return next(e);
+      }
+      throw e;
+    }
   } catch (e) {
     console.error("error:", e);
     return next(new Exception());

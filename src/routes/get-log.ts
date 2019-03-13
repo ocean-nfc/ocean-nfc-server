@@ -22,14 +22,10 @@ export const getLog: express.RequestHandler = async (req: express.Request, res: 
   const db: Database = Database.getInstance();
 
   try {
-    console.log("getting log");
-    const log = await db.all("SELECT * FROM log WHERE (date >= ? AND date <= ?)", [startDate, endDate]);
-    console.log("got log");
-    console.log("got log", log);
+    const log = await db.getLogForDates(startDate, endDate);
     res.json(log);
   } catch (e) {
-    console.error("error:");
-    console.error(e);
+    console.error("error:", e);
     next(new Exception());
   }
 
