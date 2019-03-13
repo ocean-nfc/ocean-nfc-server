@@ -1,3 +1,4 @@
+import { CardIdNotFoundException } from './../exceptions';
 import * as express from "express";
 
 /**
@@ -8,7 +9,7 @@ import * as express from "express";
 export const getClientId: express.RequestHandler = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const cardId = req.query.cardId;
   if (!cardId) {
-    return next({ error: true, message: "CARD_ID_NOT_SUPPLIED" });
+    return next(new CardIdNotFoundException());
   }
 
   res.json({
