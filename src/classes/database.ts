@@ -1,6 +1,7 @@
 import { ClientAlreadyExistsException } from "./../exceptions";
 import { Database as SQLiteDatabase } from "sqlite3";
 import { ClientIdNotFoundException } from "../exceptions";
+import * as fs from "fs";
 
 export class Database {
   private static instance = null;
@@ -271,5 +272,11 @@ export class Database {
    */
   public updateClientCardNumber(clientId, cardNumber) {
     return this.updateClient(clientId, "cardNumber", cardNumber);
+  }
+
+  public async reset() {
+    await this.ready();
+    await this.db.run("DELETE FROM db WHERE 1");
+    await this.db.run("DELETE FROM log WHERE 1");
   }
 }
