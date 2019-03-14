@@ -1,25 +1,65 @@
 # Ocean NFC Server (Group 14)
 
-## Running the server
-### Required techonologies:
-- Nodejs
-- Npm
+<a href="https://protected-inlet-56552.herokuapp.com/" target="_blank">Ocean NFC API Server</a>
 
-### Steps to run
-1. npm install
-2. npm run start
+<a href="https://github.com/ocean-nfc/ocean-nfc-server" target="_blank">Github repository</a>
+
+<a href="https://trello.com/b/DyWaguQT/ocean-nfc" target="_blank">Trello board</a>
 
 ## API Documentation
 
-|Method, URL|Parameters|Response|Example Request|Example Response|
-|---|---|---|---|---|
-| GET /get-client-id | ```{   cardId: string }``` 	| ```{error?: boolean;   message?: "CLIENT_NOT_FOUND" \| "AUTH_EXCEPTION";   userId: string; }``` 	| GET /get-client-id ?cardId=9fw341 	|  __Success:__<br />```{   error: false,   clientId: "1234" }```<br/><br/>__Failure:__<br /> ```{    error: true,   message: "CLIENT_NOT_FOUND", }```
-| GET /get-log | ```{ startDate: UTC Timestamp = 24 hours ago; endDate: UTC Timestamp = now}``` | ```{requestsLog: Array<{ time: Date; parameters: any; ip: any; url: string; method: string; headers: any; }>}``` | GET /get-log?startDate=1552465072989&endDate=1552378771124 | ```{requestsLog: [], }```
+| Endpoint                        	| Method 	| Parameters                                                   	| Example parameters                                                            	| Response                                                                                                                                     	| Example response                                                                                                                                                                                                	|
+|---------------------------------	|--------	|--------------------------------------------------------------	|-------------------------------------------------------------------------------	|----------------------------------------------------------------------------------------------------------------------------------------------	|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
+| /get-client-id-from-rfid        	| GET    	| rfid: string                                                 	| rfid: "2262253865"                                                            	| clientId: string                                                                                                                             	| { "clientId": "1" }                                                                                                                                                                                             	|
+| /get-client-id-from-card-number 	| GET    	| cardNumber: string                                           	| cardNumber: "5555555555555555"                                                	| clientId: string                                                                                                                             	| { "clientId: "1" }                                                                                                                                                                                              	|
+| /get-log                        	| GET    	| startDate: UTCTimestamp endDate: UTCTimestamp                	| startDate: 1552493201 endDate: 1552493671                                     	| Array<{ date: UTCTimestamp, statusCode: number, method: string, url: string, parameters: any, ip: string}> 	| [{ "date": 1552493671111, "statusCode": 200, "method": "GET", "url": "/get-client-id-from-card-number", "parameters": {"cardId": "5555555555555555"}, "ip": "127.0.0.1" }]|
+| /verify-pin                     	| POST   	| clientId: string pin: string                                 	| clientId: "1" pin: "1234"                                                     	| { valid: boolean }                                                                                                                           	| { "valid": false }                                                                                                                                                                                              	|
+| /add-card                       	| POST   	| clientId: string rfid: string pin: string cardNumber: string 	| clientId: "1" rfid: "2262253865", pin: "1234", cardNumber: "5555555555555555" 	| Nothing or exception                                                                                                                         	||
+| /remove-card | POST | clientId: string | clientId: "1" | Nothing or exception |
+| /update-rfid                    	| POST   	| clientId: string rfid: string                                	| clientId: "1" rfid: "2262253865"                                              	| Nothing or exception                                                                                                                         	|                                                                                                                                                                                                                 	|
+| /update-pin                     	| POST   	| clientId: string pin: string                                 	| clientId: "1" pin: "4321"                                                     	| Nothing or exception                                                                                                                         	|                                                                                                                                                                                                                 	|
+| /update-card-number             	| POST   	| clientId: string cardNumber: string                          	| clientId:" 1" cardNumber: "1234123412341234"                                  	| Nothing or exception                                                                                                                         	|                                                                                                                                                                                                                 	|
 
 ## Group Members
 
 ### Matthew Evans - 16262949
+- __Interests__: Technology, astronomy, music, film, history
+- __Skills__: JavaScript, TypeScript, Angular 2+, Ionic Framework, PHP, SQL, NodeJS, React, 64-bit assemble, Android Play Store deployment, web development, Adobe After Effects, Blender 3D, GIMP, web scraping
+- __Previous work experience__:
+  - Teaching Assistant for the CS Department, 2016
+  - Teaching Assistant for IMY department, 2017
+- __Attitudes__: curious, passionate, positive towards the future of technology
+
 ### Jarrod Goschen - 17112631
+- __Interests__: AI, science, music, game developement
+- __Skills__: C++, C#, Java, Web developement(Javascript,Node Js, PHP, Angular framework, .Net framework), Unity, Blender 3D
+- __Previous work experience__:
+  - Waiter Kaleido cafe
+  - Promoter Peoples magazine,Camel,Big Burst marketing
+- __Attitudes__: Ambitious, Determined to improve my skillset and Invested in self education
+- __GitHub__: https://github.com/wolwe1
+
 ### Johan Nel	- 16354029
 ### Given Rakgoale - 15135421
+- __Interests__: Fascinated by the world of computing, specifically networks and computer security. Interested in the development of new computing systems that could change the lives of people
+- __Skills__: Good in analysing concepts. Pretty good in programming (C++, Java and). Also can develop webpages
+- __Previous work experience__:
+  - Teaching Assistant for the CS Department, 2017
+- __Attitudes__:  I know what I want in life and what to do to get it. I&#39;m determined to succeed in all that I do. Aware of my weaknesses, but very much willing to make full use of my strengths. Confident and Honest
+- __GitHub__: https://github.com/Given-Rakgoale
+
 ### Dewald van Hoven - 15030378
+- __Interests__: Practical application of computer systems,  Business solutions, Business, Networks, Music, Events, Wildlife, Philosophy, World History
+
+- __Skills__: C++, Java, LAMP Stack, HTML, CSS, JavaScript, Psychology up to second year level, Philosophy up to third year level, Sales, Tour guiding, Events coordination, Bartending
+
+- __Previous work experience__: 
+    - Tourguide at Ecolife Expiditions
+    - Bartender at Serve Co
+    - Events coordinator at Ghaton Events
+    
+- __Attitudes__: Living a full life, positive outlook on the future, go getter, creative, curious
+
+- __LinkedIn__: https://www.linkedin.com/in/dewald-van-hoven-6a8921130/
+
+- __GitHub__: https://github.com/u15030378

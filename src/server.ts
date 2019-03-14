@@ -15,6 +15,7 @@ import { updatePin } from "./routes/update-pin";
 import { updateCardNumber } from "./routes/update-card-number";
 import { removeCard } from "./routes/remove-card";
 import { listAllClients } from "./routes/list-all-clients";
+import { home } from './routes/home';
 
 export class Server {
   private app: express.Application;
@@ -29,9 +30,7 @@ export class Server {
   }
 
   registerRoutes() {
-    this.app.get("/", (req, res) => {
-      res.send("Ocean NFC system");
-    });
+    this.app.get("/", home);
 
     this.app.get("/get-client-id-from-rfid", getClientIdFromRfid);
     this.app.get("/get-client-id-from-card-number", getClientIdFromCardNumber);
