@@ -314,5 +314,64 @@ describe("/get-client-id-from-card-number", () => {
     });
   });
 
+	const time = new Date().getTime(); //used for getting logs
+
+	describe("", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+				.get("/get-log")
+				.then(res => {
+					expect(res.status).to.equal(400, "error status 400");
+					done();
+				});
+		});
+	});
+
+	describe("", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+				.get("/get-log" + makeParams({
+					startDate: "",
+					endDate: ""
+				}))
+				.then(res => {
+					expect(res.status).to.equal(400, "error status 400");
+					done();
+				});
+		});
+	});
+
+	describe("", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+				.get("/get-log" + makeParams({
+					startDate: "1552598932",
+					endDate: "1552598930"
+				}))
+				.then(res => {
+					expect(res.status).to.equal(400, "error status 400");
+					done();
+				});
+		});
+	});
+
+	describe("", () => {
+		it("should succeed", (done) => {
+			chai
+				.request(address)
+				.get("/get-log" + makeParams({
+					startDate: time/1000,
+					endDate: (time + 1000)/1000
+				}))
+				.then(res => {
+					expect(res.status).to.equal(200, "error status 200");
+					console.log(res.body);
+					done();
+				});
+		});
+	});
 
 });
