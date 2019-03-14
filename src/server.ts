@@ -1,3 +1,4 @@
+import { corsMiddleware } from './middleware/cors-middleware';
 import { loggerMiddleware } from "./middleware/logger-middleware";
 import * as express from "express";
 
@@ -13,6 +14,8 @@ import { updateRfid } from "./routes/update-rfid";
 import { updatePin } from "./routes/update-pin";
 import { updateCardNumber } from "./routes/update-card-number";
 import { removeCard } from "./routes/remove-card";
+import { listAllClients } from "./routes/list-all-clients";
+import { home } from './routes/home';
 
 export class Server {
   private app: express.Application;
@@ -27,13 +30,12 @@ export class Server {
   }
 
   registerRoutes() {
-    this.app.get("/", (req, res) => {
-      res.send("Ocean NFC system");
-    });
+    this.app.get("/", home);
 
     this.app.get("/get-client-id-from-rfid", getClientIdFromRfid);
     this.app.get("/get-client-id-from-card-number", getClientIdFromCardNumber);
     this.app.get("/get-log", getLog);
+    this.app.get("/list-all-clients", listAllClients)
 
     this.app.post("/verify-pin", verifyPin);
     this.app.post("/add-card", addCard);
@@ -44,6 +46,7 @@ export class Server {
   }
 
   registerMiddleware() {
+    this.app.use(corsMiddleware);
     this.app.use(loggerMiddleware);
     // this.app.use(authMiddleware);
   }
