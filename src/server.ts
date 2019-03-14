@@ -1,3 +1,4 @@
+import { corsMiddleware } from './middleware/cors-middleware';
 import { loggerMiddleware } from "./middleware/logger-middleware";
 import * as express from "express";
 
@@ -46,6 +47,7 @@ export class Server {
   }
 
   registerMiddleware() {
+    this.app.use(corsMiddleware);
     this.app.use(loggerMiddleware);
     // this.app.use(authMiddleware);
   }
