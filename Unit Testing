@@ -1,0 +1,38 @@
+Unit Testing
+
+Concerned with testing each individual unit or functionality that the program or system provides.
+It is important that unit testing executes each line of code in the system (Software Testing Fundamentals, 2019).
+Done by testing individual functions with all types of correct or incorrect data.
+This ensures that all code that responds correctly and also that all exception cases are tested.
+The programmer provides dummy values and the correct result of code execution.
+
+Write test cases to be independant of one another(Software Testing Fundamentals, 2019).
+Unit tests are carried out individually. This is not stress testing the system, it is simply testing all
+the different functionality.
+
+Technologies:
+
+Mocha:
+	Java Unit testing framework that runs on Node.js and Browsers (Patro, 2019).
+	Provides simple functions that tests code.
+	Works in order:
+	1. Display description of the test being run.
+	2. Runs code to test and compares resulting value to pre-entered correct result.
+	3. Display whether a test has failed or succeeded.
+
+	*Displays test results in console.
+
+Chai:
+	BDD/TDD assertion library (Patro, 2019).
+	Assertion with Chai is simple and natural language assertions in a readable style.
+	Use this to frame assertions.
+
+For the demo:
+Write tests that test each of the API functions.
+All of the database interaction with the log and the main table.
+
+References:
+
+Patro, N. (2019). JavaScript — Unit Testing using Mocha and Chai. [online] codeburst. Available at: https://codeburst.io/javascript-unit-testing-using-mocha-and-chai-1d97d9f18e71 [Accessed 13 Mar. 2019].
+
+Software Testing Fundamentals. (2019). Unit Testing - Software Testing Fundamentals. [online] Available at: http://softwaretestingfundamentals.com/unit-testing/ [Accessed 13 Mar. 2019].
