@@ -314,5 +314,90 @@ describe("/get-client-id-from-card-number", () => {
     });
   });
 
+});
+
+
+/**
+ * /get-log
+ */
+describe("/get-log", () => {
+  before(done => {
+    Server.reset()
+      .then(() => {
+        server = new Server();
+        return server.start();
+      })
+      .then(done);
+  });
+
+  after(done => {
+    server.stop().then(done);
+  });
+
+  const time = new Date().getTime(); //used for getting logs
+  let numLogs = 0;
+
+	describe("Don't supply parameters", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+				.get("/get-log")
+				.then(res => {
+          numLogs++;
+					expect(res.status).to.equal(400, "error status 400");
+					done();
+				});
+		});
+	});
+
+	describe("Give empty dates", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+				.get("/get-log" + makeParams({
+					startDate: "",
+					endDate: ""
+				}))
+				.then(res => {
+          numLogs++;
+					expect(res.status).to.equal(400, "error status 400");
+					done();
+				});
+		});
+	});
+
+	describe("Give start date > end date", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+				.get("/get-log" + makeParams({
+					startDate: "1552598932",
+					endDate: "1552598930"
+				}))
+				.then(res => {
+          numLogs++;
+					expect(res.status).to.equal(400, "error status 400");
+					done();
+				});
+		});
+	});
+
+	describe("Give correct dates", () => {
+		it("should succeed", (done) => {
+			chai
+				.request(address)
+				.get("/get-log" + makeParams({
+					startDate: time/1000,
+					endDate: (time + 1000)/1000
+				}))
+				.then(res => {
+          numLogs++;
+					expect(res.status).to.equal(200, "error status 200");
+          console.log(res.body);
+          expect(res.body.length).to.equal(numLogs, `${numLogs} logged items`);
+					done();
+				});
+		});
+	});
 
 });
