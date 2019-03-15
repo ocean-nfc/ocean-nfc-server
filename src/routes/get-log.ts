@@ -11,8 +11,8 @@ export const getLog: express.RequestHandler = async (req: express.Request, res: 
 
   // try parse the dates. If they are invalid, then we simply
   try {
-    startDate = parseInt(startDate) * 1000;
-    endDate = parseInt(endDate) * 1000;
+    startDate = parseInt(startDate);
+    endDate = parseInt(endDate);
   } catch (e) {
     console.error(e, "invalid date");
     return next(new NotAllParamsSuppliedException());
@@ -21,6 +21,8 @@ export const getLog: express.RequestHandler = async (req: express.Request, res: 
   if (startDate > endDate) {
     return next(new NotAllParamsSuppliedException());
   }
+
+  console.log(startDate, endDate);
 
   // get the rows from the database
   const db: Database = Database.getInstance();
