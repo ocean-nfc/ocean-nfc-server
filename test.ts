@@ -599,3 +599,74 @@ describe("/update-card-number", () => {
   });
   });
 });
+
+/**
+ * /update-pin
+ */
+describe("/update-pin", () => {
+  before(done => {
+    Server.reset()
+      .then(() => {
+        server = new Server();
+        return server.start();
+      })
+      .then(done);
+  });
+
+  after(done => {
+    server.stop().then(done);
+  });
+
+  //Basic missing parameters
+	describe("Don't supply parameters", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+        .post("/update-pin")
+        .send()
+				.then(res => {
+          console.log(res.body);
+					expect(res.status).to.equal(400, "error status 400");
+					done();
+				});
+		});
+  });
+
+  //Client ID does not exist
+  describe("ClientId does not exist", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+        .post("/update-pin" + makeParams({
+          clientId: 1,
+          pin: "1234"
+        }))
+        .send()
+				.then(res => {
+          console.log(res.body);
+					expect(res.status).to.equal(404, "error status 404");
+					done();
+				});
+		});
+  });
+
+  // Valid pin number change
+  describe("Successful pin number change", () => {
+		it("should succeed,", (done) => {
+      addRandomCard(1, "1234567891234567", undefined, "1234").then(() => {
+      chai
+				.request(address)
+        .post("/update-pin" + makeParams({
+          clientId: 1,
+          pin: "1122"
+        }))
+        .send()
+				.then(res => {
+          console.log(res.body);
+          expect(res.status).to.equal(200, "error status 200");
+					done();
+				});
+    });
+  });
+  });
+});
