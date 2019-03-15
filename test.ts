@@ -1,17 +1,17 @@
+import { ClientIdNotFoundException } from './src/exceptions';
 import { Database } from "./src/classes/database";
 import { Server } from "./src/server";
-import * as assert from "assert";
 import * as chai from "chai";
 import chaiHttp = require("chai-http");
 import "mocha";
-import * as uuidv4 from "uuid/v4";
+import { config } from "./src/config";
 
 const { expect } = chai;
 
 chai.use(chaiHttp);
 
 let server: Server;
-const address = "http://localhost:3000";
+const address = `http://localhost:${config.port}`;
 
 function makeParams(params) {
   return (
@@ -34,7 +34,6 @@ function makeParams(params) {
  * @param pin 
  */
 function addRandomCard(clientId, cardNumber = undefined, rfid = undefined, pin = undefined) {
-  console.log(clientId, cardNumber, rfid, pin);
   cardNumber = typeof cardNumber !== "undefined" ? cardNumber : new Array(16).fill(undefined).reduce((acc) => acc + Math.floor(Math.random() * 9), "");
   rfid = typeof rfid !== "undefined" ? rfid : new Array(8).fill(undefined).reduce((acc) => acc + Math.floor(Math.random() * 9), "");
   pin = typeof pin !== "undefined" ? pin : new Array(4).fill(undefined).reduce((acc) => acc + Math.floor(Math.random() * 9), "");
@@ -54,6 +53,23 @@ function addRandomCard(clientId, cardNumber = undefined, rfid = undefined, pin =
 }
 
 
+/**
+ * server tests
+ */
+describe("Server tests", () => {
+  it("should reset", done => {
+    Server.reset().then(done);
+  });
+
+  it("should start", done => {
+    server = new Server();
+    server.start().then(done);
+  });
+
+  it("should stop", done => {
+    server.stop().then(done);
+  });
+});
 
 
 /**
@@ -80,6 +96,7 @@ describe("/add-card", () => {
         .post("/add-card" + makeParams({}))
         .send()
         .then(res => {
+          console.log(res.body);
           expect(res.status).to.equal(400, "error status 400");
         });
     });
@@ -100,6 +117,7 @@ describe("/add-card", () => {
         )
         .send()
         .then(res => {
+          console.log(res.body);
           expect(res.status).to.equal(400, "error status 400");
         });
     });
@@ -126,6 +144,7 @@ describe("/add-card", () => {
           let valid = true;
           try {
             const client = await db.getClient(1);
+            console.log(client);
           } catch (e) {
             valid = false;
           }
@@ -150,6 +169,7 @@ describe("/add-card", () => {
         )
         .send()
         .then(async res => {
+          console.log(res.body);
           expect(res.status).to.equal(400, "error status 400");
           done();
         });
@@ -177,6 +197,7 @@ describe("/add-card", () => {
           let valid = true;
           try {
             const client = await db.getClient(1);
+            console.log(client);
           } catch (e) {
             valid = false;
           }
@@ -211,6 +232,7 @@ describe("/remove-card", () => {
         .post("/remove-card" + makeParams({}))
         .send()
         .then(res => {
+          console.log(res.body);
           expect(res.status).to.equal(400, "error status 400");
           done();
         });
@@ -226,6 +248,7 @@ describe("/remove-card", () => {
         }))
         .send()
         .then(res => {
+          console.log(res.body);
           expect(res.status).to.equal(404, "error status 404");
           done();
         });
@@ -244,8 +267,20 @@ describe("/remove-card", () => {
               clientId: 1
             }))
             .send()
-            .then(res => {
+            .then(async res => {
               expect(res.status).to.equal(200, "error status 200");
+
+              let rowExists = true;
+              try {
+                const db = Database.getInstance();
+                await db.getClient(1);
+              } catch (e) {
+                if (e instanceof ClientIdNotFoundException) {
+                  rowExists = false;
+                }
+              }
+
+              expect(rowExists).to.equal(false, "expect row to be deleted");
               done();
             });
         })
