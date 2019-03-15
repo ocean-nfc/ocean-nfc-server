@@ -314,21 +314,43 @@ describe("/get-client-id-from-card-number", () => {
     });
   });
 
-	const time = new Date().getTime(); //used for getting logs
+});
 
-	describe("", () => {
+
+/**
+ * /get-log
+ */
+describe("/get-log", () => {
+  before(done => {
+    Server.reset()
+      .then(() => {
+        server = new Server();
+        return server.start();
+      })
+      .then(done);
+  });
+
+  after(done => {
+    server.stop().then(done);
+  });
+
+  const time = new Date().getTime(); //used for getting logs
+  let numLogs = 0;
+
+	describe("Don't supply parameters", () => {
 		it("should error", (done) => {
 			chai
 				.request(address)
 				.get("/get-log")
 				.then(res => {
+          numLogs++;
 					expect(res.status).to.equal(400, "error status 400");
 					done();
 				});
 		});
 	});
 
-	describe("", () => {
+	describe("Give empty dates", () => {
 		it("should error", (done) => {
 			chai
 				.request(address)
@@ -337,13 +359,14 @@ describe("/get-client-id-from-card-number", () => {
 					endDate: ""
 				}))
 				.then(res => {
+          numLogs++;
 					expect(res.status).to.equal(400, "error status 400");
 					done();
 				});
 		});
 	});
 
-	describe("", () => {
+	describe("Give start date > end date", () => {
 		it("should error", (done) => {
 			chai
 				.request(address)
@@ -352,13 +375,14 @@ describe("/get-client-id-from-card-number", () => {
 					endDate: "1552598930"
 				}))
 				.then(res => {
+          numLogs++;
 					expect(res.status).to.equal(400, "error status 400");
 					done();
 				});
 		});
 	});
 
-	describe("", () => {
+	describe("Give correct dates", () => {
 		it("should succeed", (done) => {
 			chai
 				.request(address)
@@ -367,8 +391,10 @@ describe("/get-client-id-from-card-number", () => {
 					endDate: (time + 1000)/1000
 				}))
 				.then(res => {
+          numLogs++;
 					expect(res.status).to.equal(200, "error status 200");
-					console.log(res.body);
+          console.log(res.body);
+          expect(res.body.length).to.equal(numLogs, `${numLogs} logged items`);
 					done();
 				});
 		});
