@@ -18,6 +18,10 @@ export const getLog: express.RequestHandler = async (req: express.Request, res: 
     return next(new NotAllParamsSuppliedException());
   }
 
+  if (startDate > endDate) {
+    return next(new NotAllParamsSuppliedException());
+  }
+
   // get the rows from the database
   const db: Database = Database.getInstance();
 

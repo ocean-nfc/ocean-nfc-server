@@ -1,3 +1,4 @@
+import { Database } from './classes/database';
 import { corsMiddleware } from './middleware/cors-middleware';
 import { loggerMiddleware } from "./middleware/logger-middleware";
 import * as express from "express";
@@ -16,17 +17,19 @@ import { updateCardNumber } from "./routes/update-card-number";
 import { removeCard } from "./routes/remove-card";
 import { listAllClients } from "./routes/list-all-clients";
 import { home } from './routes/home';
+import * as http from "http";
 
 export class Server {
   private app: express.Application;
+  private server: http.Server;
 
-  constructor() {
+  public async start() {
     this.app = express();
 
     this.registerMiddleware();
     this.registerRoutes();
     this.app.use(errorHandler);
-    this.listen();
+    await this.listen();
   }
 
   registerRoutes() {
@@ -52,8 +55,25 @@ export class Server {
   }
 
   listen() {
-    this.app.listen(config.port);
-    console.log(`Ocean NFC is listening on port ${config.port}`);
-    console.log("Press CTRL+C to stop");
+    return new Promise((resolve, reject) => {
+      this.server = this.app.listen(config.port, () => {
+        console.log(`Ocean NFC is listening on port ${config.port}`);
+        console.log("Press CTRL+C to stop");
+        resolve();
+      });
+    });
+  }
+
+  public stop(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.server.close((err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+  }
+
+  public static async reset() {
+    await Database.getInstance().reset();
   }
 }
