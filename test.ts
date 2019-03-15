@@ -606,3 +606,159 @@ describe("/update-card-number", () => {
   });
   });
 });
+
+/**
+ * /update-pin
+ */
+describe("/update-pin", () => {
+  before(done => {
+    Server.reset()
+      .then(() => {
+        server = new Server();
+        return server.start();
+      })
+      .then(done);
+  });
+
+  after(done => {
+    server.stop().then(done);
+  });
+
+  //Basic missing parameters
+	describe("Don't supply parameters", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+        .post("/update-pin")
+        .send()
+				.then(res => {
+          console.log(res.body);
+					expect(res.status).to.equal(400, "error status 400");
+					done();
+				});
+		});
+  });
+
+  //Client ID does not exist
+  describe("ClientId does not exist", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+        .post("/update-pin" + makeParams({
+          clientId: 1,
+          pin: "1234"
+        }))
+        .send()
+				.then(res => {
+          console.log(res.body);
+					expect(res.status).to.equal(404, "error status 404");
+					done();
+				});
+		});
+  });
+
+  // Valid pin number change
+  describe("Successful pin number change", () => {
+		it("should succeed,", (done) => {
+      addRandomCard(1, "1234567891234567", undefined, "1234").then(() => {
+        const newPin = "1122";
+      chai
+				.request(address)
+        .post("/update-pin" + makeParams({
+          clientId: 1,
+          pin: newPin
+        }))
+        .send()
+				.then( async res => {
+          console.log(res.body);
+          expect(res.status).to.equal(200, "error status 200");
+
+					// test that the card was updated in the database
+          const db = Database.getInstance();
+          const client = await db.getClient(1);
+          expect(client.pin).to.equal(newPin);
+          console.log(client);
+					done();
+				});
+    });
+  });
+  });
+});
+
+/**
+ * /update-rfid
+ */
+describe("/update-rfid", () => {
+  before(done => {
+    Server.reset()
+      .then(() => {
+        server = new Server();
+        return server.start();
+      })
+      .then(done);
+  });
+
+  after(done => {
+    server.stop().then(done);
+  });
+
+  //Basic missing parameters
+	describe("Don't supply parameters", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+        .post("/update-rfid")
+        .send()
+				.then(res => {
+          console.log(res.body);
+					expect(res.status).to.equal(400, "error status 400");
+					done();
+				});
+		});
+  });
+
+  //Client ID does not exist
+  describe("ClientId does not exist", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+        .post("/update-rfid" + makeParams({
+          clientId: 1,
+          rfid: "12345678"
+        }))
+        .send()
+				.then(res => {
+          console.log(res.body);
+					expect(res.status).to.equal(404, "error status 404");
+					done();
+				});
+		});
+  });
+
+  // Valid pin number change
+  describe("Successful rfid number change", () => {
+		it("should succeed,", (done) => {
+      addRandomCard(1, undefined, "12345678", undefined).then(() => {
+        const newRfid = "11223344";
+      chai
+				.request(address)
+        .post("/update-rfid" + makeParams({
+          clientId: 1,
+          rfid: newRfid
+        }))
+        .send()
+				.then( async res => {
+          console.log(res.body);
+          expect(res.status).to.equal(200, "error status 200");
+
+					// test that the card was updated in the database
+          const db = Database.getInstance();
+          const client = await db.getClient(1);
+          expect(client.rfid).to.equal(newRfid);
+          console.log(client);
+					done();
+				});
+    });
+  });
+  });
+});
