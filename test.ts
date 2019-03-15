@@ -582,17 +582,24 @@ describe("/update-card-number", () => {
   // Valid Card number change
   describe("Successful card number change", () => {
 		it("should succeed,", (done) => {
+      const newCardNumber = "1122334455667788";
       addRandomCard(1, "1234567891234567", undefined, "1234").then(() => {
       chai
 				.request(address)
         .post("/update-card-number" + makeParams({
           clientId: 1,
-          cardNumber: "1122334455667788"
+          cardNumber: newCardNumber
         }))
         .send()
-				.then(res => {
+				.then(async res => {
           console.log(res.body);
           expect(res.status).to.equal(200, "error status 200");
+
+          // test that the card was updated in the database
+          const db = Database.getInstance();
+          const client = await db.getClient(1);
+          expect(client.cardNumber).to.equal(newCardNumber);
+          console.log(client);
 					done();
 				});
     });
@@ -654,16 +661,23 @@ describe("/update-pin", () => {
   describe("Successful pin number change", () => {
 		it("should succeed,", (done) => {
       addRandomCard(1, "1234567891234567", undefined, "1234").then(() => {
+        const newPin = "1122";
       chai
 				.request(address)
         .post("/update-pin" + makeParams({
           clientId: 1,
-          pin: "1122"
+          pin: newPin
         }))
         .send()
-				.then(res => {
+				.then( async res => {
           console.log(res.body);
           expect(res.status).to.equal(200, "error status 200");
+
+					// test that the card was updated in the database
+          const db = Database.getInstance();
+          const client = await db.getClient(1);
+          expect(client.pin).to.equal(newPin);
+          console.log(client);
 					done();
 				});
     });
