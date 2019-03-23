@@ -351,6 +351,70 @@ describe("/get-client-id-from-card-number", () => {
 
 });
 
+/**
+ * /get-client-id-from-rfid
+ */
+describe("/get-client-id-from-rfid", () => {
+  before(done => {
+    Server.reset()
+      .then(() => {
+        server = new Server();
+        return server.start();
+      })
+      .then(done);
+  });
+
+  after(done => {
+    server.stop().then(done);
+  });
+
+  describe("Don't supply parameters to rfid", () => {
+    it("should error", (done) => {
+      chai
+        .request(address)
+        .get("/get-client-id-from-rfid" + makeParams({}))
+        .then(res => {
+          expect(res.status).to.equal(400, "error status 400");
+          done();
+        });
+    });
+  });
+
+  describe("Get non existing rfid", () => {
+    it("should error", (done) => {
+      chai
+        .request(address)
+        .get("/get-client-id-from-rfid" + makeParams({
+          rfid: "12345668"
+        }))
+        .then(res => {
+          expect(res.status).to.equal(404, "error status 404");
+          done();
+        });
+    });
+  });
+
+  describe("Get existing from rfid", () => {
+    it("should succeed", (done) => {
+      addRandomCard("1", undefined, "12345678").then(() => {
+        chai
+          .request(address)
+          .get("/get-client-id-from-rfid" + makeParams({
+            rfid: "12345678"
+          }))
+          .then(res => {
+            expect(res.status).to.equal(200, "error status 200");
+            console.log(res.body)
+            expect(res.body.clientId).to.equal("1");
+            done();
+          });
+        });
+    });
+  });
+
+});
+
+
 
 /**
  * /get-log
