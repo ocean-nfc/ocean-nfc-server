@@ -3,15 +3,6 @@ import { InvalidParamSuppliedException, Exception } from './../exceptions';
 import * as express from "express";
 import { NotAllParamsSuppliedException } from "../exceptions";
 
-export enum ApiEndpoint {
-  ADD_CARD = "/cards/add",
-  REMOVE_ALL_CARDS = "/cards/remove/client-id",
-  REMOVE_CARD_RFID = "/cards/remove/rfid",
-  REMOVE_CARD_CARD_NUMBER = "/cards/remove/card-number",
-  VERIFY_PIN_CARD_NUMBER = "/pin/verify/card-number",
-  VERIFY_PIN_RFID = "/pin/verify/rfid"
-}
-
 export enum HttpMethod {
   GET,
   POST
@@ -21,7 +12,7 @@ export enum HttpMethod {
  * Abstract class for wrapping Express routing
  */
 export abstract class Route {
-  abstract getEndpoint(): ApiEndpoint;
+  abstract getEndpoint(): string;
   abstract getMethod(): HttpMethod;
 
   parameters: RouteParam[] = [];
@@ -49,7 +40,8 @@ export abstract class Route {
       // throw an error if the parameter has not been given
       if (typeof paramValue === 'undefined') {
         return next(new NotAllParamsSuppliedException({
-          parameter: param.getName()
+          parameter: param.getName(),
+          example: param.getExample()
         }));
       }
 
@@ -58,7 +50,8 @@ export abstract class Route {
       if (!isValid) {
         return next(new InvalidParamSuppliedException({
           parameter: param.getName(),
-          value: paramValue
+          value: paramValue,
+          example: param.getExample()
         }));
       }
 
@@ -95,6 +88,7 @@ export class RouteParam {
    */
   constructor(
     private name: string,
+    private example: string,
     private validator: (value: any) => Promise<boolean>
   ) {}
 
@@ -104,5 +98,9 @@ export class RouteParam {
 
   public isValid(value: any): Promise<boolean> {
     return this.validator(value);
+  }
+
+  public getExample() {
+    return this.example;
   }
 }
