@@ -3,7 +3,6 @@ import { corsMiddleware } from './middleware/cors-middleware';
 import { loggerMiddleware } from "./middleware/logger-middleware";
 import * as express from "express";
 
-import { addCard } from "./routes/add-card";
 import { getClientIdFromCardNumber } from "./routes/get-client-id-from-card-number";
 import { getClientIdFromRfid } from "./routes/get-client-id-from-rfid";
 import { getLog } from "./routes/get-log";
@@ -18,6 +17,8 @@ import { removeCard } from "./routes/remove-card";
 import { listAllClients } from "./routes/list-all-clients";
 import { home } from './routes/home';
 import * as http from "http";
+import { AddCardRoute } from './routes/add-card';
+import { Route } from './classes/route';
 
 export class Server {
   private app: express.Application;
@@ -35,13 +36,14 @@ export class Server {
   registerRoutes() {
     this.app.get("/", home);
 
+    this.registerRoute(new AddCardRoute());
+
     this.app.get("/get-client-id-from-rfid", getClientIdFromRfid);
     this.app.get("/get-client-id-from-card-number", getClientIdFromCardNumber);
     this.app.get("/get-log", getLog);
     this.app.get("/list-all-clients", listAllClients)
 
     this.app.post("/verify-pin", verifyPin);
-    this.app.post("/add-card", addCard);
     this.app.post("/update-rfid", updateRfid);
     this.app.post("/update-pin", updatePin);
     this.app.post("/update-card-number", updateCardNumber);
@@ -75,5 +77,13 @@ export class Server {
 
   public static async reset() {
     await Database.getInstance().reset();
+  }
+
+  /**
+   * Registers a route
+   * @param route 
+   */
+  private registerRoute(route: Route) {
+    route.register(this.app);
   }
 }

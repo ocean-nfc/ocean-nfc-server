@@ -1,33 +1,21 @@
-import { Database } from './../classes/database';
-import { NotAllParamsSuppliedException, Exception, ClientAlreadyExistsException } from './../exceptions';
-import * as express from "express";
+import { cardValidator, rfidValidator } from './../classes/validators';
+import { ApiEndpoint, HttpMethod, RouteParam } from './../classes/route';
+import { Route } from '../classes/route';
 
-export const addCard: express.RequestHandler = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  const clientId = req.query.clientId;
-  const rfid = req.query.rfid;
-  const pin = req.query.pin;
-  const cardNumber = req.query.cardNumber;
-  if (!clientId || !rfid || !pin || !cardNumber) {
-    return next(new NotAllParamsSuppliedException());
+export class AddCardRoute extends Route {
+  getEndpoint() { return ApiEndpoint.ADD_CARD; }
+  getMethod() { return HttpMethod.POST; }
+
+  parameters = [
+    new RouteParam('clientId', async value => /^\d+$/.test(value)),
+    new RouteParam('rfid', rfidValidator),
+    new RouteParam('cardNumber', cardValidator),
+    new RouteParam('pin', async value => value.length > 4)
+  ];
+
+  protected async apiFunction(params) {
+    await this.db.addCard(params.clientId, params.rfid, params.cardId, params.pin)
+
+    return {};
   }
-
-  // add the information to the database
-  const db: Database = Database.getInstance();
-
-  try {
-    try {
-      await db.addCard(clientId, rfid, cardNumber, pin);
-    } catch (e) {
-      if (e instanceof ClientAlreadyExistsException) {
-        return next(e);
-      }
-      throw e;
-    }
-  } catch (e) {
-    console.error(e);
-    next(new Exception());
-    return;
-  }
-
-  res.json();
 }
