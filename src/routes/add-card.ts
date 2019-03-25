@@ -14,7 +14,7 @@ export class AddCardRoute extends Route {
   ];
 
   protected async apiFunction(params) {
-    await this.db.addCard(params.clientId, params.rfid, params.cardId, params.pin)
+    await this.db.addCard(params.clientId, params.rfid, params.cardNumber, params.pin)
 
     return {};
   }

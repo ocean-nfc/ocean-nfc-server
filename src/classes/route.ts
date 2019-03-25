@@ -4,8 +4,8 @@ import * as express from "express";
 import { NotAllParamsSuppliedException } from "../exceptions";
 
 export enum HttpMethod {
-  GET,
-  POST
+  GET = "GET",
+  POST = "POST"
 }
 
 /**
@@ -89,7 +89,7 @@ export class RouteParam {
   constructor(
     private name: string,
     private example: string,
-    private validator: (value: any) => Promise<boolean>
+    public validator: (value: any) => Promise<boolean>
   ) {}
 
   public getName() {
