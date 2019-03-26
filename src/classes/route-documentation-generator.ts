@@ -12,6 +12,10 @@ export class RouteDocumentationGenerator {
       fn: (route: Route) => route.getEndpoint()
     },
     {
+      name: "Description",
+      fn: (route: Route) => route.description
+    },
+    {
       name: "Parameters",
       fn: (route: Route) => {
         return route.parameters.map(parameter => {
@@ -24,6 +28,12 @@ export class RouteDocumentationGenerator {
       fn: (route: Route) => {
         return `<div class="code">` + (route.exampleResponse == null ? "" : RouteDocumentationGenerator.prettyPrintObject(route.exampleResponse)) + "</div>";
       }
+    },
+    {
+      name: "Side effects",
+      fn: (route: Route) => route.sideEffects
+        .map(sideEffect => "- " + sideEffect)
+        .join(",<br />")
     }
   ];
 

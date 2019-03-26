@@ -14,6 +14,8 @@ export class GetClientIdFromCardNumberRoute extends Route {
     clientId: exampleValidClientId
   }
 
+  description = "Return client ID from a given card number";
+
   async apiFunction(params) {
     try {
       const id = await this.db.getClientIdByCardNumber(params.cardNumber);
