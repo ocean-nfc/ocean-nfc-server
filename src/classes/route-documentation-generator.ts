@@ -19,6 +19,12 @@ export class RouteDocumentationGenerator {
         }).join("<br />");
       }
     },
+    {
+      name: "Example response",
+      fn: (route: Route) => {
+        return `<div class="code">` + (route.exampleResponse == null ? "" : RouteDocumentationGenerator.prettyPrintObject(route.exampleResponse)) + "</div>";
+      }
+    }
   ];
 
   public static generate(): string {
@@ -33,5 +39,17 @@ export class RouteDocumentationGenerator {
     ).join("\n");
 
     return md;
+  }
+
+  private static prettyPrintObject(ob, indent = "  ") {
+    if (ob instanceof Object) {
+
+      return "{<br />" + Object.keys(ob)
+        .map(key => `${indent}"${key}": ` + this.prettyPrintObject(ob[key], indent + "  "))
+        .join(",<br />")
+        + `<br />${indent.substr(2)}}`;
+    }
+
+    return JSON.stringify(ob);
   }
 }

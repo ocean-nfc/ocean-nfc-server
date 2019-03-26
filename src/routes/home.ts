@@ -51,6 +51,10 @@ export const home: express.Handler = (req, res, next) => {
           width: 600px;
           max-width: 100%;
         }
+        .code {
+          font-family: monospace;
+          white-space: pre;
+        }
       </style>
     </head>
     <body>

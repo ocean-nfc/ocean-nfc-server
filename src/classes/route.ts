@@ -12,10 +12,15 @@ export enum HttpMethod {
  * Abstract class for wrapping Express routing
  */
 export abstract class Route {
+  /// the url of the endpoint (must start with /)
   abstract getEndpoint(): string;
+  /// the method of the endpoint (HttpMethod: GET or POST)
   abstract getMethod(): HttpMethod;
-
+  /// an example response. Must be a JSON object.
+  exampleResponse = null;
+  /// list of parameters the route expects
   parameters: RouteParam[] = [];
+
   protected db: Database = Database.getInstance();
 
   /**
@@ -71,7 +76,8 @@ export abstract class Route {
   /**
    * Defines the functionality that the route performs.
    * The returned value of this function is sent as JSON to the client.
-   * @param params A parameters object
+   * @param params Object containing the parameters of the request. Only includes
+   * parameters that are included in the parameters array.
    */
   protected abstract async apiFunction(params: {[key: string]: string}): Promise<any>;
 }

@@ -1,4 +1,4 @@
-import { exampleValidCard, cardValidator } from './../classes/validators';
+import { exampleValidCard, cardValidator, exampleValidClientId } from './../classes/validators';
 import { HttpMethod, RouteParam } from './../classes/route';
 import { Route } from "../classes/route";
 
@@ -9,6 +9,10 @@ export class GetClientIdFromCardNumberRoute extends Route {
   parameters = [
     new RouteParam("cardNumber", exampleValidCard, cardValidator)
   ];
+
+  exampleResponse = {
+    clientId: exampleValidClientId
+  }
 
   async apiFunction(params) {
     try {
