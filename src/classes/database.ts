@@ -137,6 +137,10 @@ export class Database {
     ]);
   }
 
+  //PERSONAL TESTING FUNCTION NOT INTENDED FOR RELEASE
+  public printAll() {
+    return this.all("SELECT * FROM db");
+  }
   /**
    * Adds a card to the database
    * Throws exception if the client already exists in the database
@@ -151,7 +155,7 @@ export class Database {
     } catch (e) {
       if (e instanceof ClientIdNotFoundException) {
         // client doesn't exist - good
-        await this.run(`INSERT INTO db VALUES (?, ?, ? ,?)`, [
+        await this.run(`INSERT INTO db VALUES (?, ?, ? ,?,1)`, [
           clientId,
           rfid,
           cardNumber,
@@ -174,7 +178,7 @@ export class Database {
   public async removeCard(param, val) { // we no longer remove cards but deactivate them
 
     //clientId , rfid , cardNumber , pin , activated
-
+    console.log(this.printAll());
     if(param != "clientId"){  //Seperated them because i did not know if run through exceptions
       var id;
      // ensure client exists

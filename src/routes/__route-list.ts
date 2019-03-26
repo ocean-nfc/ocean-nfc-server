@@ -1,6 +1,7 @@
 import { GetClientIdFromCardNumberRoute } from './get-client-id-from-card-number';
 import { AddCardRoute } from './add-card';
 import { DeactByCardNumRoute} from './deact-by-cardnum';
+import { ListAllRoute } from './list-all-clients'
 
 /**
  * List of all routes to be registered by the server.
@@ -13,4 +14,5 @@ export const routes = [
   new AddCardRoute(),
   new GetClientIdFromCardNumberRoute(),
   new DeactByCardNumRoute(),
+  new ListAllRoute(),
 ];
