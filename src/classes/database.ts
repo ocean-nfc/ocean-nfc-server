@@ -52,7 +52,7 @@ export class Database {
   private initialiseMainTable(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.db.run(
-        "CREATE TABLE IF NOT EXISTS db (clientId TEXT, rfid TEXT, cardNumber TEXT, pin TEXT)",
+        "CREATE TABLE IF NOT EXISTS db (clientId TEXT, rfid TEXT, cardNumber TEXT, pin TEXT, activated INTEGER)",
         (res, err) => {
           if (err) reject(err);
           else resolve();
