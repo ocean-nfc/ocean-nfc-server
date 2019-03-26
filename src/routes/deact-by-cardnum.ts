@@ -1,8 +1,8 @@
-import { cardValidator, rfidValidator, exampleValidRfid, exampleValidCard, isNumber, clientIdValidator } from './../classes/validators';
+import { cardValidator, exampleValidCard} from './../classes/validators';
 import { HttpMethod, RouteParam } from './../classes/route';
 import { Route } from '../classes/route';
 
-export class DeactByCardNum extends Route {
+export class DeactByCardNumRoute extends Route {
   getEndpoint() { return "/deactivate-by-cardnumber" }
   getMethod() { return HttpMethod.POST; }
 

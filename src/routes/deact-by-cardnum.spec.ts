@@ -1,15 +1,15 @@
 import { ClientAlreadyExistsException } from './../exceptions';
 import { exampleValidCard, exampleValidClientId, exampleValidRfid } from './../classes/validators';
 import { RouteTestSuite } from '../classes/route-test-suite';
-import { AddCardRoute } from './add-card';
+import { DeactByCardNumRoute } from './deact-by-cardnum';
 
-new RouteTestSuite(new AddCardRoute())
+new RouteTestSuite(new DeactByCardNumRoute())
   .testMissingParameters()
   .testInvalidParameters()
   
-  // add a card (pass)
+  // deactivate a card (pass)
   .add({
-    name: "Add card",
+    name: "Deactivate card",
     params: {
       clientId: exampleValidClientId,
       cardNumber: exampleValidCard,
