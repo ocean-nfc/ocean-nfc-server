@@ -61,18 +61,6 @@ export class Database {
     });
   }
 
-  private initialiseLogTable(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.db.run(
-        "CREATE TABLE IF NOT EXISTS log (date INT, statusCode INT, method TEXT, url TEXT, parameters TEXT, ip TEXT)",
-        (res, err) => {
-          if (err) reject(err);
-          else resolve();
-        }
-      );
-    });
-  }
-
   /**
    * Runs a query and returns a promise
    * Do NOT use for SELECT
@@ -104,37 +92,6 @@ export class Database {
         else resolve(res);
       });
     });
-  }
-
-  /**
-   * Adds an item to the log
-   * @param date 
-   * @param statusCode 
-   * @param method 
-   * @param url 
-   * @param query 
-   * @param ip 
-   */
-  public addLogItem(date, statusCode, method, url, query: string, ip): Promise<void> {
-    return this.run("INSERT INTO log VALUES (?, ?, ?, ?, ?, ?)", [
-      date,
-      statusCode,
-      method,
-      url,
-      query,
-      ip
-    ]);
-  }
-  /**
-   * Returns a list of log items between the start and end dates
-   * @param startDate 
-   * @param endDate 
-   */
-  public getLogForDates(startDate, endDate) {
-    return this.all("SELECT * FROM log WHERE (date >= ? AND date <= ?)", [
-      startDate,
-      endDate
-    ]);
   }
 
   /**
