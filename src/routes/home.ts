@@ -58,6 +58,8 @@ export const home: express.Handler = (req, res, next) => {
       </style>
     </head>
     <body>
+      <h1>Ocean NFC API Endpoints</h1>
+      <p>*Note that our POST methods use URL parameters, not the request body.</p>
       ${marked(RouteDocumentationGenerator.generate())}
     </body>
     </html>

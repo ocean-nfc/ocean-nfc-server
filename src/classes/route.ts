@@ -17,9 +17,13 @@ export abstract class Route {
   /// the method of the endpoint (HttpMethod: GET or POST)
   abstract getMethod(): HttpMethod;
   /// an example response. Must be a JSON object.
-  exampleResponse = null;
+  exampleResponse: {[s: string]: any} = null;
   /// list of parameters the route expects
   parameters: RouteParam[] = [];
+  /// description of what this route does
+  description: string = "";
+  /// list of side effects caused by this route (e.g. sends a notification containing x)
+  sideEffects: string[] = [];
 
   protected db: Database = Database.getInstance();
 
