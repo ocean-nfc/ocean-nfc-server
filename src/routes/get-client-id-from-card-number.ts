@@ -1,34 +1,27 @@
-import { Database } from "./../classes/database";
-import { NotAllParamsSuppliedException, Exception } from "./../exceptions";
-import * as express from "express";
-import { ClientIdNotFoundException } from "../exceptions";
+import { exampleValidCard, cardValidator, exampleValidClientId } from './../classes/validators';
+import { HttpMethod, RouteParam } from './../classes/route';
+import { Route } from "../classes/route";
 
-export const getClientIdFromCardNumber: express.RequestHandler = async (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-) => {
-  const cardNumber = req.query.cardNumber;
-  if (!cardNumber) {
-    return next(new NotAllParamsSuppliedException());
+export class GetClientIdFromCardNumberRoute extends Route {
+  getEndpoint() { return "/client-id/from/card-number"; }
+  getMethod() { return HttpMethod.GET; }
+
+  parameters = [
+    new RouteParam("cardNumber", exampleValidCard, cardValidator)
+  ];
+
+  exampleResponse = {
+    clientId: exampleValidClientId
   }
 
-  const db = Database.getInstance();
-
-  try {
+  async apiFunction(params) {
     try {
-      const id = await db.getClientIdByCardNumber(cardNumber);
-      res.json({
+      const id = await this.db.getClientIdByCardNumber(params.cardNumber);
+      return {
         clientId: id
-      });
+      };
     } catch (e) {
-      if (e instanceof ClientIdNotFoundException) {
-        return next(e);
-      }
       throw e;
     }
-  } catch (e) {
-    console.error("error:", e);
-    return next(new Exception());
   }
-};
+}
