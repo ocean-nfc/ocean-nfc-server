@@ -3,8 +3,6 @@ import { exampleValidCard, exampleValidClientId, exampleValidRfid } from './../c
 import { RouteTestSuite } from '../classes/route-test-suite';
 import { AddCardRoute } from './add-card';
 
-console.log("add card route test");
-
 new RouteTestSuite(new AddCardRoute())
   .testMissingParameters()
   .testInvalidParameters()

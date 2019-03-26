@@ -1,15 +1,15 @@
+import { RouteDocumentationGenerator } from './../classes/route-documentation-generator';
 import * as express from "express";
 import * as fs from "fs";
 import * as marked from "marked";
 
 /**
- * Uses the README file to render a documentation page
+ * Provides documentation for the API endpoints
  * @param req 
  * @param res 
  * @param next 
  */
 export const home: express.Handler = (req, res, next) => {
-  const file = fs.readFileSync("./README.md");
   res.send(`
     <!DOCTYPE html>
     <html lang="en">
@@ -51,10 +51,14 @@ export const home: express.Handler = (req, res, next) => {
           width: 600px;
           max-width: 100%;
         }
+        .code {
+          font-family: monospace;
+          white-space: pre;
+        }
       </style>
     </head>
     <body>
-      ${marked(file.toString())}
+      ${marked(RouteDocumentationGenerator.generate())}
     </body>
     </html>
   `);
