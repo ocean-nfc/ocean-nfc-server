@@ -177,27 +177,15 @@ export class Database {
    */
   public async removeCard(param, val) { // we no longer remove cards but deactivate them
 
-    //clientId , rfid , cardNumber , pin , activated
-    console.log(this.printAll());
-    if(param != "clientId"){  //Seperated them because i did not know if run through exceptions
-      var id;
-     // ensure client exists
-     try{
-       id = this.getClientIdByProperty(param,val);
-       await this.run(`UPDATE db SET activated = 0 WHERE (${param}=?)`, [val]);
-     }catch(e){
-       
-     }
-    }else{
-      // ensure client exists
-      try{
-        await this.getClient(val);
-        await this.run("UPDATE db SET activated = 0 WHERE (clientId=?)", [val]);
-      }catch(e){
+    try{
 
-      }
-      
+      var id = await this.getClientIdByProperty(param,val);
+      await this.run(`UPDATE db SET activated = 0 WHERE (${param}=?)`, [val]);
+
+    }catch(e){
+      throw new ClientIdNotFoundException();
     }
+    
   }
 
   /**
