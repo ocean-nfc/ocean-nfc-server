@@ -9,9 +9,6 @@ export class AddCardRoute extends Route {
 
   parameters = [
     new RouteParam('clientId', "1", clientIdValidator),
-    //new RouteParam('rfid', exampleValidRfid, rfidValidator),
-    //new RouteParam('cardNumber', exampleValidCard, cardValidator),
-    //new RouteParam('pin', "12345", async value => isNumber(value) && value.length > 4)
   ];
 
   protected async apiFunction(params) {

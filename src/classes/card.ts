@@ -1,16 +1,26 @@
 import { Database } from './../classes/database';
 
 /**
- * This class is used to create, read, update and deactivates client's bank cards.
+ * This class is used to create, read, update and deactivate client's bank cards.
  */
 export class Card {
 
+  /**
+   * Array of valid FNB Credit Card BINs
+   * 
+   * @type string
+   */
   readonly FnbCreditCardBins: string[] = [
     "419565",
     "419566",
     "419567",
   ]
 
+  /**
+   * Array of valid FNB Debit Card BINs
+   * 
+   * @type string
+   */
   readonly FnbDebitCardBins: string[] = [
     "419570"
   ]
@@ -175,19 +185,15 @@ export class Card {
    * 
    * @param clientID - Who's card it is
    * @param credit - Credit card or not
-   * @param rfID - RfID for the card
    * @returns The new card number
    */
-  public async createNewCard(clientID: string, credit: boolean, rfID?: string,): Promise<string> {
+  public async createNewCard(clientID: string, credit: boolean): Promise<string> {
     return new Promise<string>(async (resolve, reject) => {
-      if(!rfID){
-        rfID = null;
-      }
       let number = await this.generateNewCard(credit);
       let db = Database.getInstance();
       db.run(`INSERT INTO db VALUES (?, ?, ? ,?)`, [
         clientID,
-        rfID,
+        null,
         number,
         null
       ]);
