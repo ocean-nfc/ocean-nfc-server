@@ -1,11 +1,12 @@
 export class Exception {
+  constructor(customParams = {}) {
+    for (const param in customParams) {
+      this[param] = customParams[param];
+    }
+  }
+
   message: string = "UNKNOWN_ERROR";
   code: number = HTTP_CODE.UNKNOWN;
-  toString() {
-    return JSON.stringify({
-      message: this.message
-    });
-  }
 }
 
 export class AuthException extends Exception {
@@ -18,9 +19,19 @@ export class NotAllParamsSuppliedException extends Exception {
   code: number = HTTP_CODE.BAD_REQUEST;
 }
 
+export class InvalidParamSuppliedException extends Exception {
+  message: string = "INVALID_PARAM";
+  code: number = HTTP_CODE.BAD_REQUEST;
+}
+
 export class ClientIdNotFoundException extends Exception {
   message: string = "CLIENT_ID_NOT_FOUND";
   code: number = HTTP_CODE.NOT_FOUND;
+}
+
+export class ClientAlreadyExistsException extends Exception {
+  message: string = "CLIENT_ID_ALREADY_EXISTS";
+  code: number = HTTP_CODE.BAD_REQUEST;
 }
 
 export enum HTTP_CODE {

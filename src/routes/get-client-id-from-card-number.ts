@@ -1,16 +1,29 @@
-import { NotAllParamsSuppliedException } from './../exceptions';
-import * as express from "express";
-import { ClientIdNotFoundException } from "../exceptions";
+import { exampleValidCard, cardValidator, exampleValidClientId } from './../classes/validators';
+import { HttpMethod, RouteParam } from './../classes/route';
+import { Route } from "../classes/route";
 
-export const getClientIdFromCardNumber: express.RequestHandler = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  const cardNumber = req.query.cardNumber;
-  if (!cardNumber) {
-    return next(new NotAllParamsSuppliedException());
+export class GetClientIdFromCardNumberRoute extends Route {
+  getEndpoint() { return "/client-id/from/card-number"; }
+  getMethod() { return HttpMethod.GET; }
+
+  parameters = [
+    new RouteParam("cardNumber", exampleValidCard, cardValidator)
+  ];
+
+  exampleResponse = {
+    clientId: exampleValidClientId
   }
 
-  // if client not found next(new ClientIdNotFoundException())
+  description = "Return client ID from a given card number";
 
-  res.json({
-    clientId: null,
-  });
+  async apiFunction(params) {
+    try {
+      const id = await this.db.getClientIdByCardNumber(params.cardNumber);
+      return {
+        clientId: id
+      };
+    } catch (e) {
+      throw e;
+    }
+  }
 }

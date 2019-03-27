@@ -1,27 +1,38 @@
-import { Database } from './../classes/database';
-import { NotAllParamsSuppliedException, Exception } from './../exceptions';
-import * as express from "express";
+import { cardValidator, rfidValidator, exampleValidRfid, exampleValidCard, isNumber, clientIdValidator } from './../classes/validators';
+import { HttpMethod, RouteParam } from './../classes/route';
+import { Route } from '../classes/route';
+import { Card } from '../classes/card';
 
-export const addCard: express.RequestHandler = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  const clientId = req.query.clientId;
-  const rfid = req.query.rfid;
-  const pin = req.query.pin;
-  const cardNumber = req.query.cardNumber;
-  if (!clientId || !rfid || !pin || !cardNumber) {
-    return next(new NotAllParamsSuppliedException());
+export class AddCardRoute extends Route {
+  getEndpoint() { return "/cards/add" }
+  getMethod() { return HttpMethod.POST; }
+
+  parameters = [
+    new RouteParam('clientId', "1", clientIdValidator),
+  ];
+
+  description = "Assigns a new random card to a client";
+
+  sideEffects = [
+    "Sends a notification containing the generated PIN",
+    "Sends a notification containing the generated card number/rfid"
+  ];
+
+  protected async apiFunction(params) {
+    //await this.db.addCard(params.clientId, params.rfid, params.cardId, params.pin)
+    let c = new Card();
+    let cardnumber = await c.createNewCard(params.clientId, true);
+    //call pin generation with card number
+    if(Boolean(Math.round(Math.random()))){
+      let cardnumber2 = await c.createNewCard(params.clientId, true);
+      //call pin generation with card number
+      return {
+        "cardnumber": cardnumber,
+        "secondcardnumber": cardnumber2,
+      };  
+    }
+    return {
+      "cardnumber": cardnumber,
+    };
   }
-
-  // add the information to the database
-  const db: Database = Database.getInstance();
-
-  try {
-    await db.run(`INSERT INTO db VALUES (?, ?, ? ,?)`, [clientId, rfid, cardNumber, pin]);
-    console.log(await db.run(`SELECT * FROM db`));
-  } catch (e) {
-    console.error(e);
-    next(new Exception());
-    return;
-  }
-
-  res.json();
 }
