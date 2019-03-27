@@ -1,6 +1,6 @@
 # Ocean NFC Server (Group 14)
 
-<a href="https://protected-inlet-56552.herokuapp.com/" target="_blank">Ocean NFC API Server</a> *Please see for API documentation
+<a href="https://oceannfc.herokuapp.com/" target="_blank">Ocean NFC API Server</a> *Please see for API documentation
 
 <a href="https://github.com/ocean-nfc/ocean-nfc-server" target="_blank">Github repository</a>
 

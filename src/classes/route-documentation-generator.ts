@@ -52,6 +52,12 @@ export class RouteDocumentationGenerator {
   }
 
   private static prettyPrintObject(ob, indent = "  ") {
+    if (ob instanceof Array) {
+      return "[<br />"
+        + ob.map(el => indent + this.prettyPrintObject(el, indent)).join(",<br />")
+        + `<br />${indent.substr(2)}]`;
+    }
+
     if (ob instanceof Object) {
 
       return "{<br />" + Object.keys(ob)
