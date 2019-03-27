@@ -4,18 +4,27 @@ import * as express from "express";
 import { NotAllParamsSuppliedException } from "../exceptions";
 
 export enum HttpMethod {
-  GET,
-  POST
+  GET = "GET",
+  POST = "POST"
 }
 
 /**
  * Abstract class for wrapping Express routing
  */
 export abstract class Route {
+  /// the url of the endpoint (must start with /)
   abstract getEndpoint(): string;
+  /// the method of the endpoint (HttpMethod: GET or POST)
   abstract getMethod(): HttpMethod;
-
+  /// an example response. Must be a JSON object.
+  exampleResponse: {[s: string]: any} = null;
+  /// list of parameters the route expects
   parameters: RouteParam[] = [];
+  /// description of what this route does
+  description: string = "";
+  /// list of side effects caused by this route (e.g. sends a notification containing x)
+  sideEffects: string[] = [];
+
   protected db: Database = Database.getInstance();
 
   /**
@@ -71,7 +80,8 @@ export abstract class Route {
   /**
    * Defines the functionality that the route performs.
    * The returned value of this function is sent as JSON to the client.
-   * @param params A parameters object
+   * @param params Object containing the parameters of the request. Only includes
+   * parameters that are included in the parameters array.
    */
   protected abstract async apiFunction(params: {[key: string]: string}): Promise<any>;
 }
@@ -89,7 +99,7 @@ export class RouteParam {
   constructor(
     private name: string,
     private example: string,
-    private validator: (value: any) => Promise<boolean>
+    public validator: (value: any) => Promise<boolean>
   ) {}
 
   public getName() {

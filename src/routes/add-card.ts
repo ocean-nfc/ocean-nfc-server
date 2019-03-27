@@ -11,6 +11,13 @@ export class AddCardRoute extends Route {
     new RouteParam('clientId', "1", clientIdValidator),
   ];
 
+  description = "Assigns a new random card to a client";
+
+  sideEffects = [
+    "Sends a notification containing the generated PIN",
+    "Sends a notification containing the generated card number/rfid"
+  ];
+
   protected async apiFunction(params) {
     //await this.db.addCard(params.clientId, params.rfid, params.cardId, params.pin)
     let c = new Card();
