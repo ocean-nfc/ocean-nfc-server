@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --timeout 0 -r ts-node/register ./**/*.spec.ts",
-    "start": "node -r ts-node/register index.ts",
-    "dev": "node -r ts-node/register index.ts"
+    "start": "node -r ts-node/register index.ts"
   },
   "repository": {
     "type": "git",
