@@ -2,6 +2,7 @@ import { GetClientIdFromCardNumberRoute } from './get-client-id-from-card-number
 import { AddCardRoute } from './add-card';
 import { DeactByCardNumRoute} from './deact-by-cardnum';
 import { ListAllRoute } from './list-all-clients'
+import { DeactByClientIdRoute} from './deact-by-clientId'
 
 /**
  * List of all routes to be registered by the server.
@@ -15,4 +16,5 @@ export const routes = [
   new GetClientIdFromCardNumberRoute(),
   new DeactByCardNumRoute(),
   new ListAllRoute(),
+  new DeactByClientIdRoute(),
 ];
