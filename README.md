@@ -1,10 +1,39 @@
 # Ocean NFC Server (Group 14)
 
-<a href="https://protected-inlet-56552.herokuapp.com/" target="_blank">Ocean NFC API Server</a> *Please see for API documentation
+<a href="https://oceannfc.herokuapp.com/" target="_blank">Ocean NFC API Server</a> *Please see for API documentation
 
 <a href="https://github.com/ocean-nfc/ocean-nfc-server" target="_blank">Github repository</a>
 
 <a href="https://trello.com/b/DyWaguQT/ocean-nfc" target="_blank">Trello board</a>
+
+## Running the server
+
+### Install dependencies
+```npm install```
+
+### Create .env file for development mode
+Create a file called .env. Copy and paste the contents of .env.example for development mode configuration.
+This will cause the server to use sqlite instead of postgres (for local development).
+
+### Run the server
+```npm run start```
+
+### Run tests
+```npm run test```
+
+
+## Contributing
+1. Pull the development branch: ```git pull origin development```
+2. Branch out of the development branch. Name your branch according to the feature being added ```git checkout -b my-new-feature```
+3. Make your changes
+4. Commit
+5. ```git checkout development```
+6. ```git pull origin development```
+7. ```git checkout my-new-feature```
+8. ```git merge development```
+9. Resolve your merge conflicts
+10. Git push origin my-new-feature
+11. Create a pull request on github into **development**
 
 ## Group Members
 

@@ -53,10 +53,6 @@ export class Server {
     });
   }
 
-  public static async reset() {
-    await Database.getInstance().reset();
-  }
-
   /**
    * Registers a route
    * @param route 

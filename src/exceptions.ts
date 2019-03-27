@@ -29,11 +29,6 @@ export class ClientIdNotFoundException extends Exception {
   code: number = HTTP_CODE.NOT_FOUND;
 }
 
-export class ClientAlreadyExistsException extends Exception {
-  message: string = "CLIENT_ID_ALREADY_EXISTS";
-  code: number = HTTP_CODE.BAD_REQUEST;
-}
-
 export enum HTTP_CODE {
   AUTHENTICATION = 401,
   NOT_FOUND = 404,

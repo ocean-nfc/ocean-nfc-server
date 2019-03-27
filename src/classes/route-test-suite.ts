@@ -3,7 +3,6 @@ import {
   NotAllParamsSuppliedException
 } from "./../exceptions";
 import { Route, HttpMethod, RouteParam } from "./route";
-import { Server } from "../server";
 import { config } from "../config";
 import { Response } from "superagent";
 
@@ -11,10 +10,11 @@ import * as chai from "chai";
 import chaiHttp = require("chai-http");
 import "mocha";
 import { Database } from "./database";
+import { Server } from "../server";
 const { expect } = chai;
 chai.use(chaiHttp);
 
-let server: Server;
+let server: Server = null;
 
 /**
  * Runs a set of unit tests for a route. Allows for chaining
@@ -36,12 +36,13 @@ export class RouteTestSuite {
   public run() {
     describe(this.route.getEndpoint(), () => {
       before(done => {
-        Server.reset()
-          .then(() => {
-            server = new Server();
-            return server.start();
-          })
-          .then(done);
+        (async () => {
+          server = new Server();
+          await server.start();
+
+          await Database.getInstance().reset();
+          done();
+        })();
       });
 
       after(done => {
@@ -51,7 +52,7 @@ export class RouteTestSuite {
       for (const test of this.tests) {
         it(test.name, done => {
           (async () => {
-            if (test.preamble) await test.preamble();
+            if (test.preamble) await test.preamble(Database.getInstance());
 
             const res = await RouteTestSuite.request(this.route, test.params);
             await test.test(res, expect, Database.getInstance());
@@ -136,12 +137,21 @@ export class RouteTestSuite {
    * @param route The route which will be called
    * @param params Parameters to supply to the route
    */
-  public static request(route: Route, params: { [param: string]: string }) {
+  public static async request(route: Route, params: { [param: string]: string }) {
     const req = chai.request(`http://localhost:${config.port}`);
+    const url = `${route.getEndpoint()}${this.makeParams(params)}`;
+    console.log(url);
     const method = route.getMethod() == HttpMethod.GET ? req.get : req.post;
-    return method
-      .call(req, `${route.getEndpoint()}${this.makeParams(params)}`)
-      .send();
+    try {
+      const res = await method
+        .call(req, url)
+        .send();
+
+      return res;
+    } catch (e) {
+      console.error(e, route.getEndpoint(), params);
+      throw e;
+    }
   }
 
   private static makeParams(params) {
@@ -159,7 +169,7 @@ export class RouteTestSuite {
 
 interface RouteTest {
   name: string;
-  params: { [param: string]: string };
+  params: {[param: string]: string};
   test: (response: Response, expect: Chai.ExpectStatic, db: Database) => Promise<void>;
-  preamble?: () => Promise<void>;
+  preamble?: (db: Database) => Promise<void>;
 }

@@ -1,4 +1,3 @@
-import { ClientAlreadyExistsException } from './../exceptions';
 import { exampleValidCard, exampleValidClientId, exampleValidRfid } from './../classes/validators';
 import { RouteTestSuite } from '../classes/route-test-suite';
 import { AddCardRoute } from './add-card';
@@ -19,28 +18,13 @@ new RouteTestSuite(new AddCardRoute())
     test: async (res, expect, db) => {
       expect(res.status).to.equal(200);
 
-      let valid = true;
       try {
-        const client = await db.getClient(exampleValidClientId);
-        console.log(client);
+        var cards = await db.getClientCards(exampleValidClientId);
+        console.log(cards);
       } catch (e) {
-        valid = false;
+        console.error(e);
       }
-      expect(valid).to.equal(true, "added to server successfully");
-    }
-  })
- 
-  // add the same card (fail)
-  .add({
-    name: "Add card with same client id",
-    params: {
-      clientId: exampleValidClientId,
-      cardNumber: exampleValidCard,
-      rfid: exampleValidRfid,
-      pin: "12345"
-    },
-    test: async (res, expect, db) => {
-      expect(res.body.message).to.equal(new ClientAlreadyExistsException().message);
+      expect(cards.length).to.be.gt(0, "added to server successfully");
     }
   })
  
@@ -56,14 +40,13 @@ new RouteTestSuite(new AddCardRoute())
     test: async (res, expect, db) => {
       expect(res.status).to.equal(200);
 
-      let valid = true;
       try {
-        const client = await db.getClient("2");
-        console.log(client);
+        var cards = await db.getClientCards("2");
+        console.log(cards);
       } catch (e) {
-        valid = false;
+        console.error(e);
       }
-      expect(valid).to.equal(true, "added to server successfully");
+      expect(cards.length).to.be.gt(0, "added to server successfully");
     }
   })  
   .run();

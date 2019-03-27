@@ -72,8 +72,8 @@ export abstract class Route {
     try {
       res.json(await this.apiFunction(params));
     } catch (e) {
-      console.error(e);
-      next(new Exception(e));
+      console.log(e);
+      next(e);
     }
   }
 
