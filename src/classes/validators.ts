@@ -1,3 +1,5 @@
+import { Card } from "./card";
+
 export const isNumber = (value) => {
   return /^\d+$/.test(value);
 }
@@ -8,7 +10,7 @@ export const clientIdValidator = async (clientId: string) => {
 export const exampleValidClientId = "1";
 
 export const cardValidator = async (card: string) => {
-  return card.length == 16 && isNumber(card);
+  return (new Card()).isCardNumberValid(card);
 }
 export const exampleValidCard = "1234123412341234";
 
