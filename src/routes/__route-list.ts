@@ -6,6 +6,7 @@ import { ListAllRoute } from "./list-all-clients";
 import { DeactByClientIdRoute } from "./deact-by-clientId";
 import { DeactByRfidRoute } from "./deact-by-rfid";
 import { VerifyPinByCardNumberRoute } from "./verify-pin-card-number";
+import { GetClientIdFromRfidNumberRoute } from "./client-id-from-rfid";
 
 /**
  * List of all routes to be registered by the server.
@@ -18,6 +19,7 @@ export const routes = [
   new AddCardRoute(),
 
   new GetClientIdFromCardNumberRoute(),
+  new GetClientIdFromRfidNumberRoute(),
 
   new ListAllRoute(),
 
