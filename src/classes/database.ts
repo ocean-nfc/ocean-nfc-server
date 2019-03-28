@@ -1,4 +1,3 @@
-import { ClientAlreadyExistsException } from "./../exceptions";
 import { Database as SQLiteDatabase } from "sqlite3";
 import { ClientIdNotFoundException } from "../exceptions";
 import * as fs from "fs";
@@ -43,7 +42,6 @@ export class Database {
     return new Promise(resolve => {
       this.db = new SQLiteDatabase("./db.sqlite", () => {
         this.initialiseMainTable()
-          .then(() => this.initialiseLogTable())
           .then(resolve);
       });
     });
@@ -53,18 +51,6 @@ export class Database {
     return new Promise((resolve, reject) => {
       this.db.run(
         "CREATE TABLE IF NOT EXISTS db (clientId TEXT, rfid TEXT, cardNumber TEXT, pin TEXT, activated INTEGER)",
-        (res, err) => {
-          if (err) reject(err);
-          else resolve();
-        }
-      );
-    });
-  }
-
-  private initialiseLogTable(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.db.run(
-        "CREATE TABLE IF NOT EXISTS log (date INT, statusCode INT, method TEXT, url TEXT, parameters TEXT, ip TEXT)",
         (res, err) => {
           if (err) reject(err);
           else resolve();
@@ -107,41 +93,6 @@ export class Database {
   }
 
   /**
-   * Adds an item to the log
-   * @param date 
-   * @param statusCode 
-   * @param method 
-   * @param url 
-   * @param query 
-   * @param ip 
-   */
-  public addLogItem(date, statusCode, method, url, query: string, ip): Promise<void> {
-    return this.run("INSERT INTO log VALUES (?, ?, ?, ?, ?, ?)", [
-      date,
-      statusCode,
-      method,
-      url,
-      query,
-      ip
-    ]);
-  }
-  /**
-   * Returns a list of log items between the start and end dates
-   * @param startDate 
-   * @param endDate 
-   */
-  public getLogForDates(startDate, endDate) {
-    return this.all("SELECT * FROM log WHERE (date >= ? AND date <= ?)", [
-      startDate,
-      endDate
-    ]);
-  }
-
-  //PERSONAL TESTING FUNCTION NOT INTENDED FOR RELEASE
-  public printAll() {
-    return this.all("SELECT * FROM db");
-  }
-  /**
    * Adds a card to the database
    * Throws exception if the client already exists in the database
    * @param clientId 
@@ -167,7 +118,6 @@ export class Database {
       }
     }
 
-    throw new ClientAlreadyExistsException();
   }
 
   /**
@@ -178,7 +128,6 @@ export class Database {
   public async removeCard(param, val) { // we no longer remove cards but deactivate them
 
     //clientId , rfid , cardNumber , pin , activated
-    console.log(this.printAll());
     if(param != "clientId"){  //Seperated them because i did not know if run through exceptions
       var id;
      // ensure client exists
@@ -300,6 +249,5 @@ export class Database {
   public async reset() {
     await this.ready();
     await this.db.run("DELETE FROM db WHERE 1");
-    await this.db.run("DELETE FROM log WHERE 1");
   }
 }

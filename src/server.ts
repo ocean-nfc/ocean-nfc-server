@@ -8,7 +8,11 @@ import { config } from "./config";
 import { errorHandler } from "./middleware/error-handler";
 import { home } from './routes/home';
 import * as http from "http";
+<<<<<<< HEAD
 import { Route } from './classes/route';
+=======
+import { Log } from './classes/log';
+>>>>>>> 19747e13fe7123ea10c043dd12e63c6d17eb785b
 
 export class Server {
   private app: express.Application;
@@ -55,6 +59,7 @@ export class Server {
 
   public static async reset() {
     await Database.getInstance().reset();
+    await Log.getInstance().reset();
   }
 
   /**
