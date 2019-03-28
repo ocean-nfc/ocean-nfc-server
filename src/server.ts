@@ -18,6 +18,7 @@ import { removeCard } from "./routes/remove-card";
 import { listAllClients } from "./routes/list-all-clients";
 import { home } from './routes/home';
 import * as http from "http";
+import { Log } from './classes/log';
 
 export class Server {
   private app: express.Application;
@@ -75,5 +76,6 @@ export class Server {
 
   public static async reset() {
     await Database.getInstance().reset();
+    await Log.getInstance().reset();
   }
 }

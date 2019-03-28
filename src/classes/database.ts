@@ -43,7 +43,6 @@ export class Database {
     return new Promise(resolve => {
       this.db = new SQLiteDatabase("./db.sqlite", () => {
         this.initialiseMainTable()
-          .then(() => this.initialiseLogTable())
           .then(resolve);
       });
     });
@@ -234,6 +233,5 @@ export class Database {
   public async reset() {
     await this.ready();
     await this.db.run("DELETE FROM db WHERE 1");
-    await this.db.run("DELETE FROM log WHERE 1");
   }
 }
