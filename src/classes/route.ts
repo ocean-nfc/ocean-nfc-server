@@ -17,7 +17,7 @@ export abstract class Route {
   /// the method of the endpoint (HttpMethod: GET or POST)
   abstract getMethod(): HttpMethod;
   /// an example response. Must be a JSON object.
-  exampleResponse: {[s: string]: any} = null;
+  exampleResponses: Array<{[s: string]: any}> = [];
   /// list of parameters the route expects
   parameters: RouteParam[] = [];
   /// description of what this route does

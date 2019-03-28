@@ -2,9 +2,9 @@ import {
   exampleValidClientId,
   exampleValidRfid,
   exampleValidPin
-} from "./../classes/validators";
-import { GetClientIdFromCardNumberRoute } from "./get-client-id-from-card-number";
-import { RouteTestSuite } from "./../classes/route-test-suite";
+} from "../classes/validators";
+import { GetClientIdFromCardNumberRoute } from "./client-id-from-card-number";
+import { RouteTestSuite } from "../classes/route-test-suite";
 import { exampleValidCard } from "../classes/validators";
 
 new RouteTestSuite(new GetClientIdFromCardNumberRoute())

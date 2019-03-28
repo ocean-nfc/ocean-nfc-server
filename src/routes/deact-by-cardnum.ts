@@ -4,7 +4,7 @@ import { Route } from "../classes/route";
 
 export class DeactByCardNumRoute extends Route {
   getEndpoint() {
-    return "/deactivate-by-cardnumber";
+    return "/deactivate-by-card-number";
   }
   getMethod() {
     return HttpMethod.POST;
