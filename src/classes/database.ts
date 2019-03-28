@@ -44,6 +44,7 @@ export class Database {
         });
       }
       else {
+        console.log("PROD DB URL:", process.env.DATABASE_URL);
         this.connection = await createConnection({
           type: "postgres",
           url: process.env.DATABASE_URL,
