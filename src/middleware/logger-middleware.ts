@@ -20,8 +20,9 @@ export const loggerMiddleware: express.RequestHandler = (req: express.Request, r
   
     console.log(logItem.join(" "));
     
-    const db = Database.getInstance();
-    db.addLogItem(logItem[0], logItem[1], logItem[2], logItem[3], logItem[4].toString(), logItem[5]);
+    // TODO: implement logger file
+    // const db = Database.getInstance();
+    // db.addLogItem(logItem[0], logItem[1], logItem[2], logItem[3], logItem[4].toString(), logItem[5]);
   })
 
   next();
