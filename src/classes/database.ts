@@ -48,6 +48,9 @@ export class Database {
         this.connection = await createConnection({
           type: "postgres",
           url: process.env.DATABASE_URL,
+          entities: [
+            ClientCard
+          ],
         });
       }
 
