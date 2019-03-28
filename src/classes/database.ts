@@ -45,7 +45,8 @@ export class Database {
       }
       else {
         this.connection = await createConnection({
-          type: "postgres"
+          type: "postgres",
+          url: process.env.DATABASE_URL,
         });
       }
 
