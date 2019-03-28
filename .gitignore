@@ -2,3 +2,5 @@
 /package-lock.json
 /db.sqlite
 /npm-debug.log
+/.env
+/log.json

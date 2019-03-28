@@ -1,253 +1,208 @@
-import { Database as SQLiteDatabase } from "sqlite3";
-import { ClientIdNotFoundException } from "../exceptions";
-import * as fs from "fs";
+import { ClientIdNotFoundException } from './../exceptions';
+import "reflect-metadata";
+import { createConnection, Connection, Repository } from "typeorm";
+import { ClientCard } from "../models/client-card";
+import { config } from "../config";
 
 export class Database {
-  private static instance = null;
-  public static getInstance(): Database {
-    if (Database.instance === null) {
-      Database.instance = new Database();
+
+  private connection: Connection;
+  private cardManager: Repository<ClientCard>;
+
+  private static instance: Database = null;
+  public static getInstance() {
+    if (this.instance == null) {
+      this.instance = new Database();
     }
-    return Database.instance;
+    return this.instance;
   }
 
-  private db: SQLiteDatabase;
-  private constructor() {}
-
+  private constructor() {}    
+  
   private readyListeners = [];
   private hasInitialised = false;
   private isInitialising = false;
-  private ready(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      if (this.hasInitialised) {
-        return resolve();
-      }
+  private ready() : Promise<void> {
+    return new Promise(async (resolve, reject) => {
+      if (this.hasInitialised) return resolve();
 
       this.readyListeners.push(resolve);
 
-      if (this.isInitialising) return; // someone else has already started initialising the database
+      if (this.isInitialising) return;
       this.isInitialising = true;
 
-      this.openDatabase().then(() => {
-        while (this.readyListeners.length) {
-          this.readyListeners[0](); // resolve the listener
-          this.readyListeners.shift(); // remove the listener from the list
-        }
-        this.hasInitialised = true;
-      });
-    });
-  }
+      console.log("DEVELOPMENT MODE:", config.developmentMode);
 
-  private openDatabase(): Promise<void> {
-    return new Promise(resolve => {
-      this.db = new SQLiteDatabase("./db.sqlite", () => {
-        this.initialiseMainTable()
-          .then(resolve);
-      });
-    });
-  }
+      if (config.developmentMode) {
+        this.connection = await createConnection({
+          type: "sqlite",
+          database: "db.sqlite",
+          entities: [
+            ClientCard
+          ],
+          synchronize: true,
+        });
+      }
+      else {
+        this.connection = await createConnection({
+          type: "postgres"
+        });
+      }
 
-  private initialiseMainTable(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.db.run(
-        "CREATE TABLE IF NOT EXISTS db (clientId TEXT, rfid TEXT, cardNumber TEXT, pin TEXT, activated INTEGER)",
-        (res, err) => {
-          if (err) reject(err);
-          else resolve();
-        }
-      );
-    });
-  }
+      this.cardManager = this.connection.getRepository(ClientCard);
 
-  /**
-   * Runs a query and returns a promise
-   * Do NOT use for SELECT
-   * @param sqlQuery
-   * @param params
-   */
-  public run(sqlQuery: string, params?: any): Promise<void> {
-    return new Promise<void>(async (resolve, reject) => {
-      await this.ready();
-      this.db.run(sqlQuery, params, err => {
-        if (err) console.log(err);
-        if (err) reject(err);
-        else resolve();
-      });
-    });
-  }
+      while (this.readyListeners.length) {
+        this.readyListeners[0]();
+        this.readyListeners.shift();
+      }
 
-  /**
-   * Runs a query and returns a promise containing the resulting rows.
-   * Use for SELECT
-   * @param sqlQuery
-   * @param params
-   */
-  public all(sqlQuery: string, params?: any): Promise<any> {
-    return new Promise<any>(async (resolve, reject) => {
-      await this.ready();
-      this.db.all(sqlQuery, params, (err, res) => {
-        if (err) reject(err);
-        else resolve(res);
-      });
+      this.hasInitialised = true;
     });
   }
 
   /**
    * Adds a card to the database
-   * Throws exception if the client already exists in the database
    * @param clientId 
    * @param rfid 
    * @param cardNumber 
    * @param pin 
    */
   public async addCard(clientId, rfid, cardNumber, pin) {
-    try {
-      await this.getClient(clientId);
-    } catch (e) {
-      if (e instanceof ClientIdNotFoundException) {
-        // client doesn't exist - good
-        await this.run(`INSERT INTO db VALUES (?, ?, ? ,?,1)`, [
-          clientId,
-          rfid,
-          cardNumber,
-          pin
-        ]);
-        return;
-      } else {
-        throw e;
-      }
+    await this.ready();
+    
+    const card = new ClientCard();
+    card.clientId = clientId;
+    card.rfid = rfid;
+    card.cardNumber = cardNumber;
+    card.pin = pin;
+    card.isActivated = true;
+
+    return await this.cardManager.save(card);
+  }
+
+  public async getAllClients(): Promise<ClientCard[]> {
+    return await this.cardManager.find();
+  }
+
+  public async getClientCards(clientId): Promise<ClientCard[]> {
+    await this.ready();
+
+    return await this.cardManager.find({
+      clientId
+    });
+  }
+
+  public async getClientIdFromCardNumber(cardNumber) {
+    await this.ready();
+
+    const card = await this.cardManager.findOne({
+      cardNumber
+    });
+
+    if (card == null) {
+      return null;
     }
 
+    return card.clientId;
+  }
+
+  public async getClientIdfromRfid(rfid) {
+    await this.ready();
+
+    const card = await this.cardManager.findOne({
+      rfid
+    });
+
+    if (card == null) {
+      return null;
+    }
+
+    return card.clientId;
   }
 
   /**
-   * Deactivates a card in the database.
-   * Throws exception if client doesn't exist
-   * @param clientId 
+   * Remove a card according to the parameter given
+   * @param parameter 
+   * @param value 
    */
-  public async removeCard(param, val) { // we no longer remove cards but deactivate them
+  public async removeCard(parameter: string, value: string) {
+    await this.ready();
 
-    //clientId , rfid , cardNumber , pin , activated
-    if(param != "clientId"){  //Seperated them because i did not know if run through exceptions
-      var id;
-     // ensure client exists
-     try{
-       id = this.getClientIdByProperty(param,val);
-       await this.run(`UPDATE db SET activated = 0 WHERE (${param}=?)`, [val]);
-     }catch(e){
-       
-     }
-    }else{
-      // ensure client exists
-      try{
-        await this.getClient(val);
-        await this.run("UPDATE db SET activated = 0 WHERE (clientId=?)", [val]);
-      }catch(e){
+    const cards = await this.cardManager.find({
+      [parameter]: value
+    });
 
-      }
-      
+    if (!cards.length) {
+      throw new ClientIdNotFoundException({
+        [parameter]: value
+      });
+    }
+
+    for (const card of cards) {
+      card.isActivated = false;
+      await this.cardManager.save(card);
     }
   }
 
-  /**
-   * Returns a list of all clients
-   */
-  public getAllClients() {
-    return this.all("SELECT * FROM db");
+  public async getByCardNumber(cardNumber) {
+    await this.ready();
+
+    return await this.cardManager.findOne({
+      cardNumber
+    });
   }
 
-  private async getAllClientsByProperty(propertyName, propertyValue) {
-    const users = await this.all(`SELECT * FROM db WHERE (${propertyName}=?)`, [
-      propertyValue
-    ]);
-    if (users.length === 0) {
-      throw new ClientIdNotFoundException();
-    }
-    return users;
-  }
+  public async getByRfid(rfid) {
+    await this.ready();
 
-  private async getClientByProperty(propertyName, propertyValue) {
-    return (await this.getAllClientsByProperty(propertyName, propertyValue))[0];
-  }
-
-  private async getClientIdByProperty(propertyName, propertyValue) {
-    return (await this.getClientByProperty(propertyName, propertyValue))
-      .clientId;
+    return await this.cardManager.findOne({
+      rfid
+    });
   }
 
   /**
-   * Returns a client ID for matching card number.
-   * Throws ClientIdNotFoundException
+   * Returns the client id from a card number
    * @param cardNumber 
    */
-  public getClientIdByCardNumber(cardNumber) {
-    return this.getClientIdByProperty("cardNumber", cardNumber);
+  public async getClientIdByCardNumber(cardNumber: string) {
+    await this.ready();
+
+    const card = await this.cardManager.findOne({
+      cardNumber
+    });
+
+    if (card == null) {
+      return null;
+    }
+
+    return card.clientId;
   }
 
   /**
-   * Returns a client ID for matching RFID
-   * Throws ClientIdNotFoundException
+   * Return the client id from an rfid
    * @param rfid 
    */
-  public getClientIdByRfid(rfid) {
-    return this.getClientIdByProperty("rfid", rfid);
+  public async getClientIdByRfid(rfid: string) {
+    await this.ready();
+
+    const card = await this.cardManager.findOne({
+      rfid
+    });
+
+    if (card == null) {
+      return null;
+    }
+
+    return card.clientId;
   }
 
   /**
-   * Returns a client object for the given id
-   * Throws ClientIdNotFoundException
-   * @param clientId 
+   * Resets the database
    */
-  public getClient(clientId) {
-    return this.getClientByProperty("clientId", clientId);
-  }
-
-  /**
-   * Update a specified property of a client
-   * Throws ClientIdNotFoundException
-   * @param clientId 
-   * @param propertyName 
-   * @param propertyValue 
-   */
-  public async updateClient(clientId, propertyName, propertyValue) {
-    // test that the client exists
-    await this.getClient(clientId);
-    return await this.run(
-      `UPDATE db SET ${propertyName}=? WHERE (clientId=?)`,
-      [propertyValue, clientId]
-    );
-  }
-
-  /**
-   * Update client rfid for specified client
-   * Throws ClientIdNotFoundException
-   * @param clientId 
-   * @param rfid 
-   */
-  public updateClientRfid(clientId, rfid) {
-    return this.updateClient(clientId, "rfid", rfid);
-  }
-  /**
-   * Update client pin for specified client
-   * Throws ClientIdNotFoundException
-   * @param clientId 
-   * @param pin 
-   */
-  public updateClientPin(clientId, pin) {
-    return this.updateClient(clientId, "pin", pin);
-  }
-  /**
-   * Update client card number for specified client id
-   * Throws ClientIdNotFoundException
-   * @param clientId 
-   * @param cardNumber 
-   */
-  public updateClientCardNumber(clientId, cardNumber) {
-    return this.updateClient(clientId, "cardNumber", cardNumber);
-  }
-
   public async reset() {
     await this.ready();
-    await this.db.run("DELETE FROM db WHERE 1");
+
+    await this.cardManager.clear();
   }
+  
 }
