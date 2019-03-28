@@ -1,8 +1,7 @@
 import { VerifyPinByRfidRoute } from "./verify-pin-rfid";
-import { GetClientIdFromCardNumberRoute } from "./get-client-id-from-card-number";
+import { GetClientIdFromCardNumberRoute } from "./client-id-from-card-number";
 import { AddCardRoute } from "./add-card";
 import { DeactByCardNumRoute } from "./deact-by-cardnum";
-import { ListAllRoute } from "./list-all-clients";
 import { DeactByClientIdRoute } from "./deact-by-clientId";
 import { DeactByRfidRoute } from "./deact-by-rfid";
 import { VerifyPinByCardNumberRoute } from "./verify-pin-card-number";
@@ -20,8 +19,6 @@ export const routes = [
 
   new GetClientIdFromCardNumberRoute(),
   new GetClientIdFromRfidNumberRoute(),
-
-  new ListAllRoute(),
 
   new DeactByCardNumRoute(),
   new DeactByClientIdRoute(),

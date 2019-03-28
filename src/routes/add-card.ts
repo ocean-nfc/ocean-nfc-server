@@ -24,12 +24,13 @@ export class AddCardRoute extends Route {
     "Sends a notification containing the generated card number/rfid"
   ];
 
-  exampleResponse = {
-    cardNumbers: [exampleValidCard, exampleValidCard2]
-  };
+  exampleResponses = [
+    {
+      cardNumbers: [exampleValidCard, exampleValidCard2],
+    }
+  ];
 
   protected async apiFunction(params) {
-    
     const cardNumbers = [];
 
     for (let i = 0; i < Math.floor(Math.random() * 2) + 1; i++) {

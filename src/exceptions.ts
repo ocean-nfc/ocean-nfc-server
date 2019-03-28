@@ -29,6 +29,11 @@ export class ClientIdNotFoundException extends Exception {
   code: number = HTTP_CODE.NOT_FOUND;
 }
 
+export class NotAuthorisedException extends Exception {
+  message: string = "NOT_AUTHORISED";
+  code: number = HTTP_CODE.AUTHENTICATION;
+}
+
 export enum HTTP_CODE {
   AUTHENTICATION = 401,
   NOT_FOUND = 404,
