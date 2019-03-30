@@ -1,5 +1,5 @@
-import * as fs from "fs";
 import * as jsonfile from "jsonfile";
+import * as axios from "axios";
 
 export class Log {
   private static instance = null;
@@ -11,18 +11,16 @@ export class Log {
   }
 
   private constructor() {}
+  private file = "./log.json";
+  private logCounter = 0;
 
   /**
    * Initialises the json log file
    */
-
   public initialiseLogFile() {
-    const file = "/Logs/logs.json";
-    const header = { system: "CRDS" };
-
-    jsonfile.writeFileSync(file, header, function(err) {
-      if (err) console.error(err);
-    });
+    const header = { system: "CRDS", data: [] };
+    this.writeToLogFile(header);
+    console.log("Log file has been initialised.");
   }
 
   /**
@@ -39,10 +37,37 @@ export class Log {
       query: logData[4],
       ip: logData[5]
     };
-    jsonfile.writeFileSync(file, log, { flag: "a+" }, function(err) {
-      if (err) console.error(err);
-    });
+
+    fileObj['data'].push(log);
+    this.writeToLogFile(fileObj);
+    this.logCounter++;
     console.log("Log Item was appended to file.");
+  }
+
+  /**
+   * Writes the logs into the log file
+   * @param jsonObj 
+   */
+  private writeToLogFile(jsonObj) {
+    jsonfile.writeFileSync(this.file, jsonObj, { flag: "w"} , function(err) {
+      if (err) console.error(err);
+    });    
+  }
+
+  /**
+   * Sends the log file data to the reporting subsystem
+   * @param fileData 
+   */
+  private sendLogFile(fileData) {
+    axios.default.post("https://fnbreports-6455.nodechef.com/api",fileData)
+    .then((res) => {
+      console.log("Log file has be sent to reporting statusCode: ${res.statusCode}");
+      console.log(res);
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+    this.logCounter = 0;
   }
 
   public async reset() {
