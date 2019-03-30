@@ -28,7 +28,17 @@ export class Log {
    * @param logData
    */
   public addLogItem(logData) {
-    const file = "./log.json";
+    if(this.logCounter == 0) {
+      this.initialiseLogFile();
+    }
+    
+    var fileObj = jsonfile.readFileSync(this.file);
+
+    if(this.logCounter == 100){
+      this.sendLogFile(fileObj);
+      this.initialiseLogFile();
+    }
+
     const log = {
       date: logData[0],
       statusCode: logData[1],
