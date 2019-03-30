@@ -2,9 +2,15 @@ import {
   exampleValidClientId,
   exampleValidRfid,
   exampleValidPin
+<<<<<<< HEAD:src/routes/client-id-from-card-number.spec.ts
 } from "../classes/validators";
 import { GetClientIdFromCardNumberRoute } from "./client-id-from-card-number";
 import { RouteTestSuite } from "../classes/route-test-suite";
+=======
+} from "./../classes/validators";
+import { GetClientIdFromCardNumberRoute } from "./get-client-id-from-card-number";
+import { RouteTestSuite } from "./../classes/route-test-suite";
+>>>>>>> verify-pin:src/routes/get-client-id-from-card-number.spec.ts
 import { exampleValidCard } from "../classes/validators";
 
 new RouteTestSuite(new GetClientIdFromCardNumberRoute())

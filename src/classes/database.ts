@@ -194,6 +194,81 @@ export class Database {
     }
 
     return card.clientId;
+  /**
+   * Return clientId and report success or failure on verification
+   * @param rfid 
+   * @param pin
+   */
+  public async verifyPinByRfid(rfid: string, pin: string) {
+    await this.ready();
+
+    const card = await this.cardManager.findOne({
+      rfid
+    });
+
+    if (card == null) {
+      return { 
+        "validCard": false,
+        "message": "NOT_AUTHORISED",
+        "code": 401
+      };
+    }
+
+    if (card.pin == pin)
+    {
+      return {
+        "validCard" : true,
+        "clientId" : card.clientId
+      };
+    }
+    else
+    {
+      return { 
+        "validCard": true,
+        "message" : "NOT_AUTHORISED",
+        "code" : 401,
+        "clientId" : card.ClientIdNotFoundException
+      };
+    }
+
+  }
+
+    /**
+   * Return clientId and report success or failure on verification
+   * @param rfid 
+   * @param pin
+   */
+  public async verifyPinByCardNumber(cardNumber: string, pin: string) {
+    await this.ready();
+
+    const card = await this.cardManager.findOne({
+      cardNumber
+    });
+
+    if (card == null) {
+      return { 
+        "validCard": false,
+        "message": "NOT_AUTHORISED",
+        "code": 401
+      };
+    }
+
+    if (card.pin == pin)
+    {
+      return {
+        "validCard" : true,
+        "clientId" : card.clientId
+      };
+    }
+    else
+    {
+      return { 
+        "validCard": true,
+        "message" : ,
+        "code" : 401,
+        "clientId" : card.ClientIdNotFoundException
+      };
+
   }
 
   /**
