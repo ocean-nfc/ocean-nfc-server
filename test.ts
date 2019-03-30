@@ -351,6 +351,70 @@ describe("/get-client-id-from-card-number", () => {
 
 });
 
+/**
+ * /get-client-id-from-rfid
+ */
+describe("/get-client-id-from-rfid", () => {
+  before(done => {
+    Server.reset()
+      .then(() => {
+        server = new Server();
+        return server.start();
+      })
+      .then(done);
+  });
+
+  after(done => {
+    server.stop().then(done);
+  });
+
+  describe("Don't supply parameters to rfid", () => {
+    it("should error", (done) => {
+      chai
+        .request(address)
+        .get("/get-client-id-from-rfid" + makeParams({}))
+        .then(res => {
+          expect(res.status).to.equal(400, "error status 400");
+          done();
+        });
+    });
+  });
+
+  describe("Get non existing rfid", () => {
+    it("should error", (done) => {
+      chai
+        .request(address)
+        .get("/get-client-id-from-rfid" + makeParams({
+          rfid: "12345668"
+        }))
+        .then(res => {
+          expect(res.status).to.equal(404, "error status 404");
+          done();
+        });
+    });
+  });
+
+  describe("Get existing from rfid", () => {
+    it("should succeed", (done) => {
+      addRandomCard("1", undefined, "12345678").then(() => {
+        chai
+          .request(address)
+          .get("/get-client-id-from-rfid" + makeParams({
+            rfid: "12345678"
+          }))
+          .then(res => {
+            expect(res.status).to.equal(200, "error status 200");
+            console.log(res.body)
+            expect(res.body.clientId).to.equal("1");
+            done();
+          });
+        });
+    });
+  });
+
+});
+
+
 
 /**
  * /get-log
@@ -369,7 +433,7 @@ describe("/get-log", () => {
     server.stop().then(done);
   });
 
-  const time = new Date().getTime(); //used for getting logs
+  const time = Math.round(Date.now() / 1000); //used for getting logs
   let numLogs = 0;
 
 	describe("Don't supply parameters", () => {
@@ -379,6 +443,7 @@ describe("/get-log", () => {
 				.get("/get-log")
 				.then(res => {
           numLogs++;
+          console.log(res.body);
 					expect(res.status).to.equal(400, "error status 400");
 					done();
 				});
@@ -395,6 +460,7 @@ describe("/get-log", () => {
 				}))
 				.then(res => {
           numLogs++;
+          console.log(res.body);
 					expect(res.status).to.equal(400, "error status 400");
 					done();
 				});
@@ -411,6 +477,7 @@ describe("/get-log", () => {
 				}))
 				.then(res => {
           numLogs++;
+          console.log(res.body);
 					expect(res.status).to.equal(400, "error status 400");
 					done();
 				});
@@ -419,20 +486,343 @@ describe("/get-log", () => {
 
 	describe("Give correct dates", () => {
 		it("should succeed", (done) => {
-			chai
-				.request(address)
-				.get("/get-log" + makeParams({
-					startDate: time/1000,
-					endDate: (time + 1000)/1000
-				}))
-				.then(res => {
-          numLogs++;
-					expect(res.status).to.equal(200, "error status 200");
+      chai
+        .request(address)
+        .get("/get-log" + makeParams({
+          startDate: time,
+          endDate: Math.round((Date.now()) / 1000)
+        }))
+        .then(res => {
+          expect(res.status).to.equal(200, "error status 200");
           console.log(res.body);
           expect(res.body.length).to.equal(numLogs, `${numLogs} logged items`);
-					done();
-				});
+          done();
+        });
 		});
 	});
 
+});
+
+
+
+/**
+ * /verify-pin
+ */
+describe("/verify-pin", () => {
+  before(done => {
+    Server.reset()
+      .then(() => {
+        server = new Server();
+        return server.start();
+      })
+      .then(done);
+  });
+
+  after(done => {
+    server.stop().then(done);
+  });
+
+	describe("Don't supply parameters", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+        .post("/verify-pin")
+        .send()
+				.then(res => {
+          console.log(res.body);
+					expect(res.status).to.equal(400, "error status 400");
+					done();
+				});
+		});
+  });
+
+  describe("Check pin for non-existing user", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+        .post("/verify-pin" + makeParams({
+          clientId: 1,
+          pin: "12345"
+        }))
+        .send()
+				.then(res => {
+          console.log(res.body);
+					expect(res.status).to.equal(404, "error status 404");
+					done();
+				});
+		});
+  });
+
+  describe("Check pin for existing user", () => {
+		it("should succeed", (done) => {
+
+      addRandomCard(1, undefined, undefined, "12345").then(() => {
+        chai
+          .request(address)
+          .post("/verify-pin" + makeParams({
+            clientId: 1,
+            pin: "12345"
+          }))
+          .send()
+          .then(res => {
+            console.log(res.body);
+            expect(res.status).to.equal(200, "error status 200");
+            expect(res.body.valid).to.equal(true);
+            done();
+          });
+        });
+		});
+  });
+
+  describe("Check invalid pin for existing user", () => {
+		it("should succeed, but return invalid", (done) => {
+			chai
+				.request(address)
+        .post("/verify-pin" + makeParams({
+          clientId: 1,
+          pin: "123456"
+        }))
+        .send()
+				.then(res => {
+          console.log(res.body);
+          expect(res.status).to.equal(200, "error status 200");
+          expect(res.body.valid).to.equal(false);
+					done();
+				});
+		});
+  });
+});
+
+/**
+ * /update-card-number
+ */
+describe("/update-card-number", () => {
+  before(done => {
+    Server.reset()
+      .then(() => {
+        server = new Server();
+        return server.start();
+      })
+      .then(done);
+  });
+
+  after(done => {
+    server.stop().then(done);
+  });
+
+  //Basic missing parameters
+	describe("Don't supply parameters", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+        .post("/update-card-number")
+        .send()
+				.then(res => {
+          console.log(res.body);
+					expect(res.status).to.equal(400, "error status 400");
+					done();
+				});
+		});
+  });
+
+  //Client ID does not exist
+  describe("ClientId does not exist", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+        .post("/update-card-number" + makeParams({
+          clientId: 1,
+          cardNumber: "1234567891234567"
+        }))
+        .send()
+				.then(res => {
+          console.log(res.body);
+					expect(res.status).to.equal(404, "error status 404");
+					done();
+				});
+		});
+  });
+
+  // Valid Card number change
+  describe("Successful card number change", () => {
+		it("should succeed,", (done) => {
+      const newCardNumber = "1122334455667788";
+      addRandomCard(1, "1234567891234567", undefined, "1234").then(() => {
+      chai
+				.request(address)
+        .post("/update-card-number" + makeParams({
+          clientId: 1,
+          cardNumber: newCardNumber
+        }))
+        .send()
+				.then(async res => {
+          console.log(res.body);
+          expect(res.status).to.equal(200, "error status 200");
+
+          // test that the card was updated in the database
+          const db = Database.getInstance();
+          const client = await db.getClient(1);
+          expect(client.cardNumber).to.equal(newCardNumber);
+          console.log(client);
+					done();
+				});
+    });
+  });
+  });
+});
+
+/**
+ * /update-pin
+ */
+describe("/update-pin", () => {
+  before(done => {
+    Server.reset()
+      .then(() => {
+        server = new Server();
+        return server.start();
+      })
+      .then(done);
+  });
+
+  after(done => {
+    server.stop().then(done);
+  });
+
+  //Basic missing parameters
+	describe("Don't supply parameters", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+        .post("/update-pin")
+        .send()
+				.then(res => {
+          console.log(res.body);
+					expect(res.status).to.equal(400, "error status 400");
+					done();
+				});
+		});
+  });
+
+  //Client ID does not exist
+  describe("ClientId does not exist", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+        .post("/update-pin" + makeParams({
+          clientId: 1,
+          pin: "1234"
+        }))
+        .send()
+				.then(res => {
+          console.log(res.body);
+					expect(res.status).to.equal(404, "error status 404");
+					done();
+				});
+		});
+  });
+
+  // Valid pin number change
+  describe("Successful pin number change", () => {
+		it("should succeed,", (done) => {
+      addRandomCard(1, "1234567891234567", undefined, "1234").then(() => {
+        const newPin = "1122";
+      chai
+				.request(address)
+        .post("/update-pin" + makeParams({
+          clientId: 1,
+          pin: newPin
+        }))
+        .send()
+				.then( async res => {
+          console.log(res.body);
+          expect(res.status).to.equal(200, "error status 200");
+
+					// test that the card was updated in the database
+          const db = Database.getInstance();
+          const client = await db.getClient(1);
+          expect(client.pin).to.equal(newPin);
+          console.log(client);
+					done();
+				});
+    });
+  });
+  });
+});
+
+/**
+ * /update-rfid
+ */
+describe("/update-rfid", () => {
+  before(done => {
+    Server.reset()
+      .then(() => {
+        server = new Server();
+        return server.start();
+      })
+      .then(done);
+  });
+
+  after(done => {
+    server.stop().then(done);
+  });
+
+  //Basic missing parameters
+	describe("Don't supply parameters", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+        .post("/update-rfid")
+        .send()
+				.then(res => {
+          console.log(res.body);
+					expect(res.status).to.equal(400, "error status 400");
+					done();
+				});
+		});
+  });
+
+  //Client ID does not exist
+  describe("ClientId does not exist", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+        .post("/update-rfid" + makeParams({
+          clientId: 1,
+          rfid: "12345678"
+        }))
+        .send()
+				.then(res => {
+          console.log(res.body);
+					expect(res.status).to.equal(404, "error status 404");
+					done();
+				});
+		});
+  });
+
+  // Valid pin number change
+  describe("Successful rfid number change", () => {
+		it("should succeed,", (done) => {
+      addRandomCard(1, undefined, "12345678", undefined).then(() => {
+        const newRfid = "11223344";
+      chai
+				.request(address)
+        .post("/update-rfid" + makeParams({
+          clientId: 1,
+          rfid: newRfid
+        }))
+        .send()
+				.then( async res => {
+          console.log(res.body);
+          expect(res.status).to.equal(200, "error status 200");
+
+					// test that the card was updated in the database
+          const db = Database.getInstance();
+          const client = await db.getClient(1);
+          expect(client.rfid).to.equal(newRfid);
+          console.log(client);
+					done();
+				});
+    });
+  });
+  });
 });
