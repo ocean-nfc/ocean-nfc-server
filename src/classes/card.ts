@@ -1,4 +1,5 @@
 import { Database } from "./../classes/database";
+import { PinManager } from "./pin";
 
 /**
  * This class is used to create, read, update and deactivate client's bank cards.
@@ -43,9 +44,10 @@ export class CardManager {
     }else{
       rfid = null;
     }
+    let pinhash = await PinManager.createNewPin(clientID);
     let db = Database.getInstance();
     
-    await db.addCard(clientID, rfid, number, "12345"); // TODO: replace "12345" with pin generation code
+    await db.addCard(clientID, rfid, number, pinhash);
 
     return number;
   }
