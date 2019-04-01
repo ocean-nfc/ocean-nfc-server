@@ -70,11 +70,10 @@ export class Log {
     axios.default.post("https://fnbreports-6455.nodechef.com/api",fileData)
     .then((res) => {
       console.log("Log file has be sent to reporting statusCode: ${res.statusCode}");
-      console.log(res);
       fs.unlinkSync("./log.json");
     })
     .catch((err) => {
-      console.error(err);
+      console.error("Log failed to send");
     });
   }
 
