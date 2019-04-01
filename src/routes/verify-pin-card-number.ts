@@ -2,11 +2,11 @@ import {
   exampleValidCard,
   cardValidator,
   exampleValidPin,
-  pinValidator,
-  exampleValidClientId
+  pinValidator
 } from "./../classes/validators";
 import { HttpMethod, RouteParam } from "./../classes/route";
 import { Route } from "../classes/route";
+import { NotAuthorisedException } from "../exceptions";
 
 export class VerifyPinByCardNumberRoute extends Route {
   getEndpoint() {

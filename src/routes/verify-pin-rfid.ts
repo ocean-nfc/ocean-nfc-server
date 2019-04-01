@@ -2,6 +2,7 @@ import { exampleValidRfid, rfidValidator } from "./../classes/validators";
 import { exampleValidPin, pinValidator,exampleValidClientId } from "../classes/validators";
 import { HttpMethod, RouteParam } from "../classes/route";
 import { Route } from "../classes/route";
+import { NotAuthorisedException } from "../exceptions";
 
 
 export class VerifyPinByRfidRoute extends Route {
