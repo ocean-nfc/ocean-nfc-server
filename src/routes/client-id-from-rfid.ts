@@ -7,7 +7,8 @@ import { HttpMethod, RouteParam } from "./../classes/route";
 import { Route } from "../classes/route";
 import {
   ClientIdNotFoundException,
-  NotAuthorisedException
+  NotAuthorisedException,
+  AuthException
 } from "../exceptions";
 
 export class GetClientIdFromRfidNumberRoute extends Route {
@@ -36,9 +37,20 @@ export class GetClientIdFromRfidNumberRoute extends Route {
     `;
 
   async apiFunction(params) {
+    
     const id = await this.db.getClientIdByRfid(params.rfid);
 
     if (id == null) throw new ClientIdNotFoundException();
+
+    //check card is active - J
+    const clientCards = await this.db.getClientCards(id);
+
+    for (const card of clientCards) {
+
+      if(card.rfid == params.rfid && card.isActivated == false)  //Make sure we are checking the right card
+       throw new AuthException({"Error": "Card is deactivated"});
+      
+    } 
 
     return {
       clientId: id

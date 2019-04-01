@@ -1,4 +1,4 @@
-import { NotAuthorisedException } from './../exceptions';
+import { NotAuthorisedException,AuthException } from './../exceptions';
 import { ClientIdNotFoundException } from "../exceptions";
 import {
   exampleValidCard,
@@ -38,6 +38,16 @@ export class GetClientIdFromCardNumberRoute extends Route {
     const id = await this.db.getClientIdByCardNumber(params.cardNumber);
 
     if (id == null) throw new ClientIdNotFoundException();
+
+    const clientCards = await this.db.getClientCards(id);
+
+     //check card is active - J
+    for (const card of clientCards) {
+
+      if(card.cardNumber == params.cardNumber && card.isActivated == false)  //Make sure we are checking the right card
+       throw new AuthException({"Error": "Card is deactivated"});
+      
+    } 
 
     return {
       clientId: id

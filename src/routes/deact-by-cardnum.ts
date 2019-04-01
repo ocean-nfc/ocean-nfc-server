@@ -1,6 +1,7 @@
 import { cardValidator, exampleValidCard } from "./../classes/validators";
 import { HttpMethod, RouteParam } from "./../classes/route";
 import { Route } from "../classes/route";
+import { AuthException, NotAuthorisedException } from "../exceptions";
 
 export class DeactByCardNumRoute extends Route {
   getEndpoint() {
@@ -10,6 +11,14 @@ export class DeactByCardNumRoute extends Route {
     return HttpMethod.POST;
   }
 
+  exampleResponses = [
+    {
+      success : "{}"
+    },
+    {
+      ...new NotAuthorisedException()
+    }
+  ];
   parameters = [new RouteParam("cardNumber", exampleValidCard, cardValidator)];
 
   description = "Deactivates a clients card via receiving its card number";

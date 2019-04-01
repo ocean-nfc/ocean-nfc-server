@@ -4,6 +4,7 @@ import {
 } from "./../classes/validators";
 import { HttpMethod, RouteParam } from "./../classes/route";
 import { Route } from "../classes/route";
+import { AuthException, NotAuthorisedException } from "../exceptions";
 
 export class DeactByClientIdRoute extends Route {
   getEndpoint() {
@@ -12,6 +13,15 @@ export class DeactByClientIdRoute extends Route {
   getMethod() {
     return HttpMethod.POST;
   }
+
+  exampleResponses = [
+    {
+      success : "{}"
+    },
+    {
+      ...new NotAuthorisedException()
+    }
+  ];
 
   parameters = [
     new RouteParam("clientId", exampleValidClientId, clientIdValidator)
