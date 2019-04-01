@@ -1,5 +1,6 @@
 import * as jsonfile from "jsonfile";
 import * as axios from "axios";
+import * as fs from "fs";
 
 export class Log {
   private static instance = null;
@@ -12,7 +13,6 @@ export class Log {
 
   private constructor() {}
   private file = "./log.json";
-  private logCounter = 0;
 
   /**
    * Initialises the json log file
@@ -28,15 +28,14 @@ export class Log {
    * @param logData
    */
   public addLogItem(logData) {
-    if(this.logCounter == 0) {
+    if(!fs.existsSync("./log.json")) {
       this.initialiseLogFile();
     }
     
     var fileObj = jsonfile.readFileSync(this.file);
 
-    if(this.logCounter == 100){
+    if(fileObj['data'].length >= 100){
       this.sendLogFile(fileObj);
-      this.initialiseLogFile();
     }
 
     const log = {
@@ -50,7 +49,6 @@ export class Log {
 
     fileObj['data'].push(log);
     this.writeToLogFile(fileObj);
-    this.logCounter++;
     console.log("Log Item was appended to file.");
   }
 
@@ -73,11 +71,11 @@ export class Log {
     .then((res) => {
       console.log("Log file has be sent to reporting statusCode: ${res.statusCode}");
       console.log(res);
+      fs.unlinkSync("./log.json");
     })
     .catch((err) => {
       console.error(err);
     });
-    this.logCounter = 0;
   }
 
   public async reset() {
