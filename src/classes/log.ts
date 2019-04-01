@@ -34,12 +34,8 @@ export class Log {
     
     var fileObj = jsonfile.readFileSync(this.file);
 
-    if(fileObj['data'].length >= 100){
-      this.sendLogFile(fileObj);
-    }
-
     const log = {
-      date: logData[0],
+      timestamp: logData[0],
       statusCode: logData[1],
       method: logData[2],
       url: logData[3],
@@ -50,6 +46,10 @@ export class Log {
     fileObj['data'].push(log);
     this.writeToLogFile(fileObj);
     console.log("Log Item was appended to file.");
+
+    if(fileObj['data'].length >= 100){
+      this.sendLogFile(fileObj);
+    }
   }
 
   /**
@@ -67,14 +67,14 @@ export class Log {
    * @param fileData 
    */
   private sendLogFile(fileData) {
-    axios.default.post("https://fnbreports-6455.nodechef.com/api",fileData)
+    axios.default.post("https://fnbreports-6455.nodechef.com/api", { system: "CRDS", data: JSON.stringify(fileData['data'])})
     .then((res) => {
-      console.log("Log file has be sent to reporting statusCode: ${res.statusCode}");
-      console.log(res);
+      console.log("Log file has be sent to reporting statusCode: "+res.status);
+      console.log(res.data);
       fs.unlinkSync("./log.json");
     })
     .catch((err) => {
-      console.error(err);
+      console.error(err.status+" "+err.data);
     });
   }
 
