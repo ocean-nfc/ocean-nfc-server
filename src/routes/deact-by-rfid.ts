@@ -5,6 +5,7 @@ import {
 } from "./../classes/validators";
 import { HttpMethod, RouteParam } from "./../classes/route";
 import { Route } from "../classes/route";
+import { AuthException, NotAuthorisedException } from "../exceptions";
 
 export class DeactByRfidRoute extends Route {
   getEndpoint() {
@@ -13,6 +14,15 @@ export class DeactByRfidRoute extends Route {
   getMethod() {
     return HttpMethod.POST;
   }
+
+  exampleResponses = [
+    {
+      success : "{}"
+    },
+    {
+      ...new NotAuthorisedException()
+    }
+  ];
 
   parameters = [new RouteParam("rfid", exampleValidRfid, rfidValidator)];
 

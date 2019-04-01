@@ -1,4 +1,4 @@
-import { ClientIdNotFoundException } from "./../exceptions";
+import { ClientIdNotFoundException, AuthException } from "./../exceptions";
 import "reflect-metadata";
 import { createConnection, Connection, Repository } from "typeorm";
 import { ClientCard } from "../models/client-card";
@@ -138,10 +138,21 @@ export class Database {
       });
     }
 
+    var activeCardFound = false;  // effectively makes no diff but you shouldnt be able to deactivate a deactivated card
+
     for (const card of cards) {
-      card.isActivated = false;
-      await this.cardManager.save(card);
+
+      if(card.isActivated == true){ //check if at least 1/2 cards were active
+
+        activeCardFound = true;
+        card.isActivated = false;
+        await this.cardManager.save(card);
+      }
+      
     }
+
+    if(activeCardFound == false)
+    throw new AuthException({"Error": "Card already deactivated"});
   }
 
   public async getByCardNumber(cardNumber) {
