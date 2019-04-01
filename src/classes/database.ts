@@ -194,6 +194,7 @@ export class Database {
     }
 
     return card.clientId;
+  }
   /**
    * Return clientId and report success or failure on verification
    * @param rfid 
@@ -227,7 +228,7 @@ export class Database {
         "validCard": true,
         "message" : "NOT_AUTHORISED",
         "code" : 401,
-        "clientId" : card.ClientIdNotFoundException
+        "clientId" : card.clientId
       };
     }
 
@@ -264,12 +265,14 @@ export class Database {
     {
       return { 
         "validCard": true,
-        "message" : ,
+        "message" : "NOT_AUTHORISED" ,
         "code" : 401,
-        "clientId" : card.ClientIdNotFoundException
+        "clientId" : card.clientId
       };
 
   }
+
+}
 
   /**
    * Resets the database
