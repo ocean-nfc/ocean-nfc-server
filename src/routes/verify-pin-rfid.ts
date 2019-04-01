@@ -1,8 +1,8 @@
-import { NotAuthorisedException } from './../exceptions';
 import { exampleValidRfid, rfidValidator } from "./../classes/validators";
-import { exampleValidPin, pinValidator } from "../classes/validators";
+import { exampleValidPin, pinValidator,exampleValidClientId } from "../classes/validators";
 import { HttpMethod, RouteParam } from "../classes/route";
 import { Route } from "../classes/route";
+
 
 export class VerifyPinByRfidRoute extends Route {
   getEndpoint() {
@@ -13,11 +13,8 @@ export class VerifyPinByRfidRoute extends Route {
     return HttpMethod.POST;
   }
 
-  description = `Verify that a pin is correct for the given card by rfid.
-    If the RFID does not exist, returns that the card is invalid.
-    If the RFID does exist and the PIN is incorrect, returns not authorised exception with the client ID.
-    If the RFID and PIN are correct, returns that the card is valid and the client id.
-  `;
+  description =
+    "Verify that a pin is correct for the given card by card number";
 
   parameters = [
     new RouteParam("rfid", exampleValidRfid, rfidValidator),
@@ -27,11 +24,13 @@ export class VerifyPinByRfidRoute extends Route {
   exampleResponses = [
     { // card doesn't exist
       validCard: false,
-      ...new NotAuthorisedException()
+      ...new NotAuthorisedException(),
+      code: 401
     },
     { // card exists, incorrect pin
       validCard: true,
       ...new NotAuthorisedException(),
+      code: 401,
       clientId: "1"
     },
     { // card exists, correct pin
@@ -40,7 +39,10 @@ export class VerifyPinByRfidRoute extends Route {
     }
   ];
 
-  async apiFunction() {
-    return;
+  async apiFunction(params) {
+
+    const res = await this.db.verifyPinByRfid(params.rfid,params.pin);
+
+    return res;
   }
 }
