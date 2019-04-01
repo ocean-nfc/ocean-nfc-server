@@ -24,10 +24,23 @@ export class VerifyPinByCardNumberRoute extends Route {
     new RouteParam("pin", exampleValidPin, pinValidator)
   ];
 
-  exampleResponse = {
-    clientId : exampleValidClientId,
-    status: "AUTHENTICATION SUCCESS"
-  };
+  exampleResponses = [
+    { // card doesn't exist
+      validCard: false,
+      ...new NotAuthorisedException() ,
+      code: 401
+    },
+    { // card exists, incorrect pin
+      validCard: true,
+      ...new NotAuthorisedException(),
+      code: 401,
+      clientId: "1"
+    },
+    { // card exists, correct pin
+      validCard: true,
+      clientId: "1"
+    }
+  ];
 
   async apiFunction(params) {
     const res = await this.db.verifyPinByCardNumber(params.cardNumber,params.pin);

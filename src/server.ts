@@ -1,5 +1,4 @@
 import { routes } from './routes/__route-list';
-import { Database } from './classes/database';
 import { corsMiddleware } from './middleware/cors-middleware';
 import { loggerMiddleware } from "./middleware/logger-middleware";
 import * as express from "express";

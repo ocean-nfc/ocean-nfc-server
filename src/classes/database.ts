@@ -1,11 +1,11 @@
-import { ClientIdNotFoundException } from './../exceptions';
+import { ClientIdNotFoundException } from "./../exceptions";
 import "reflect-metadata";
 import { createConnection, Connection, Repository } from "typeorm";
 import { ClientCard } from "../models/client-card";
 import { config } from "../config";
+import { PinManager } from "./pin";
 
 export class Database {
-
   private connection: Connection;
   private cardManager: Repository<ClientCard>;
 
@@ -17,12 +17,12 @@ export class Database {
     return this.instance;
   }
 
-  private constructor() {}    
-  
+  private constructor() {}
+
   private readyListeners = [];
   private hasInitialised = false;
   private isInitialising = false;
-  private ready() : Promise<void> {
+  private ready(): Promise<void> {
     return new Promise(async (resolve, reject) => {
       if (this.hasInitialised) return resolve();
 
@@ -37,15 +37,16 @@ export class Database {
         this.connection = await createConnection({
           type: "sqlite",
           database: "db.sqlite",
-          entities: [
-            ClientCard
-          ],
-          synchronize: true,
+          entities: [ClientCard],
+          synchronize: true
         });
-      }
-      else {
+      } else {
+        console.log("PROD DB URL:", process.env.DATABASE_URL);
         this.connection = await createConnection({
-          type: "postgres"
+          type: "postgres",
+          url: process.env.DATABASE_URL,
+          entities: [ClientCard],
+          synchronize: true
         });
       }
 
@@ -62,14 +63,14 @@ export class Database {
 
   /**
    * Adds a card to the database
-   * @param clientId 
-   * @param rfid 
-   * @param cardNumber 
-   * @param pin 
+   * @param clientId
+   * @param rfid
+   * @param cardNumber
+   * @param pin
    */
   public async addCard(clientId, rfid, cardNumber, pin) {
     await this.ready();
-    
+
     const card = new ClientCard();
     card.clientId = clientId;
     card.rfid = rfid;
@@ -122,8 +123,8 @@ export class Database {
 
   /**
    * Remove a card according to the parameter given
-   * @param parameter 
-   * @param value 
+   * @param parameter
+   * @param value
    */
   public async removeCard(parameter: string, value: string) {
     await this.ready();
@@ -162,7 +163,7 @@ export class Database {
 
   /**
    * Returns the client id from a card number
-   * @param cardNumber 
+   * @param cardNumber
    */
   public async getClientIdByCardNumber(cardNumber: string) {
     await this.ready();
@@ -180,7 +181,7 @@ export class Database {
 
   /**
    * Return the client id from an rfid
-   * @param rfid 
+   * @param rfid
    */
   public async getClientIdByRfid(rfid: string) {
     await this.ready();
@@ -275,6 +276,85 @@ export class Database {
 }
 
   /**
+   * Return clientId and report success or failure on verification
+   * @param cardNumber
+   * @param pin
+   */
+  public async verifyPinByCardNumber(cardNumber: string, pin: string) {
+    await this.ready();
+
+    const card = await this.cardManager.findOne({
+      cardNumber
+    });
+
+    if (card == null || !card.isActivated) {
+      return { 
+        "validCard": false,
+        "message": "NOT_AUTHORISED",
+        "code": 401
+      };
+    }
+
+    if (PinManager.verifyPinHash(pin,card.pin))
+    {
+      return {
+        "validCard" : true,
+        "clientId" : card.clientId
+      };
+    }
+    else
+    {
+      return { 
+        "validCard": true,
+        "message" : "NOT_AUTHORISED" ,
+        "code" : 401,
+        "clientId" : card.clientId
+      };
+
+  }
+}
+
+
+  /**
+   * Return clientId and report success or failure on verification
+   * @param rfid
+   * @param pin
+   */
+public async verifyPinByRfid(rfid: string, pin: string) {
+  await this.ready();
+
+  const card = await this.cardManager.findOne({
+    rfid
+  });
+
+  if (card == null || !card.isActivated) {
+    return { 
+      "validCard": false,
+      "message": "NOT_AUTHORISED",
+      "code": 401
+    };
+  }
+
+  if (PinManager.verifyPinHash(pin, card.pin))
+  {
+    return {
+      "validCard" : true,
+      "clientId" : card.clientId
+    };
+  }
+  else
+  {
+    return { 
+      "validCard": true,
+      "message" : "NOT_AUTHORISED",
+      "code" : 401,
+      "clientId" : card.clientId
+    };
+  }
+
+}
+
+  /**
    * Resets the database
    */
   public async reset() {
@@ -282,5 +362,4 @@ export class Database {
 
     await this.cardManager.clear();
   }
-  
 }

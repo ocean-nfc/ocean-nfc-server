@@ -1,9 +1,31 @@
 import { Database } from "./../classes/database";
+import { PinManager } from "./pin";
 
 /**
  * This class is used to create, read, update and deactivate client's bank cards.
  */
 export class CardManager {
+
+  /**
+   * Array of valid FNB Credit Card BINs
+   *
+   * @type string
+   */
+  private static readonly FnbCreditCardBins: string[] = [
+    "419565",
+    "419566",
+    "419567"
+  ];
+
+  /**
+   * Array of valid FNB Debit Card BINs
+   *
+   * @type string
+   */
+  private static readonly FnbDebitCardBins: string[] = [
+    "419570"
+  ];
+  
   /**
    * Generates a new bank card and save it to the database with the client's ID.
    *
@@ -16,18 +38,19 @@ export class CardManager {
     credit: boolean
   ): Promise<string> {
     let number = await this.generateNewCard(credit);
+    let rfid: string;
+    if(Boolean(Math.round(Math.random()))){
+      rfid = await this.generateRfIDNumber();
+    }else{
+      rfid = null;
+    }
+    let pinhash = await PinManager.createNewPin(clientID);
     let db = Database.getInstance();
-
-    await db.addCard(clientID, null, number, "12345"); // TODO: replace "12345" with pin generation code
+    
+    await db.addCard(clientID, rfid, number, pinhash);
 
     return number;
   }
-
-  public static deactivateCardByRfid() {}
-
-  public static deactivateCardByNumber() {}
-
-  public static deactivateAllCards() {}
 
   /**
    * Checks whether or not the bank card is valid by performing a selection of tests.
@@ -47,24 +70,6 @@ export class CardManager {
     }
     return true;
   }
-
-  /**
-   * Array of valid FNB Credit Card BINs
-   *
-   * @type string
-   */
-  private static readonly FnbCreditCardBins: string[] = [
-    "419565",
-    "419566",
-    "419567"
-  ];
-
-  /**
-   * Array of valid FNB Debit Card BINs
-   *
-   * @type string
-   */
-  private static readonly FnbDebitCardBins: string[] = ["419570"];
 
   /**
    * Generates and returns the checkdigit/checksum for the card number.
@@ -199,4 +204,39 @@ export class CardManager {
     }
     return number;
   }
+
+  /**
+   * Checks whether or not the rfid number exists.
+   * 
+   * @param number - The rfid number to check
+   * @returns Whether or not the card exists
+   */
+  private static async doesRfidExist(number: string): Promise<boolean> {
+    const db = Database.getInstance();
+
+    const rfid = await db.getClientIdByRfid(number);
+
+    return rfid != null;
+  }
+  
+  /**
+   * Generates a valid new rfid number 
+   * 
+   * @returns The new rfid number
+   */
+  private static async generateRfIDNumber(): Promise<string> {
+    let number: string;
+    let valid = false;
+    while(!valid){
+      let min = 10000000;
+      let max = 99999999;
+      let random = Math.floor(Math.random() * max + min);
+      number = random.toString();
+
+      let temp = await this.doesRfidExist(number);
+      valid = !temp;
+    }
+    return number;
+  }
+
 }
