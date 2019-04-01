@@ -31,11 +31,13 @@ export class VerifyPinByCardNumberRoute extends Route {
   exampleResponses = [
     { // card doesn't exist
       validCard: false,
-      ...new NotAuthorisedException()
+      ...new NotAuthorisedException() ,
+      code: 401
     },
     { // card exists, incorrect pin
       validCard: true,
       ...new NotAuthorisedException(),
+      code: 401,
       clientId: "1"
     },
     { // card exists, correct pin
@@ -44,7 +46,9 @@ export class VerifyPinByCardNumberRoute extends Route {
     }
   ];
 
-  async apiFunction() {
-    return;
+  async apiFunction(params) {
+    const res = await this.db.verifyPinByCardNumber(params.cardNumber,params.pin);
+
+    return res;
   }
 }

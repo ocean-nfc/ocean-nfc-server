@@ -27,11 +27,13 @@ export class VerifyPinByRfidRoute extends Route {
   exampleResponses = [
     { // card doesn't exist
       validCard: false,
-      ...new NotAuthorisedException()
+      ...new NotAuthorisedException(),
+      code: 401
     },
     { // card exists, incorrect pin
       validCard: true,
       ...new NotAuthorisedException(),
+      code: 401,
       clientId: "1"
     },
     { // card exists, correct pin
@@ -40,7 +42,10 @@ export class VerifyPinByRfidRoute extends Route {
     }
   ];
 
-  async apiFunction() {
-    return;
+  async apiFunction(params) {
+
+    const res = await this.db.verifyPinByRfid(params.rfid,params.pin);
+
+    return res;
   }
 }

@@ -3,6 +3,7 @@ import "reflect-metadata";
 import { createConnection, Connection, Repository } from "typeorm";
 import { ClientCard } from "../models/client-card";
 import { config } from "../config";
+import { PinManager } from "./pin";
 
 export class Database {
   private connection: Connection;
@@ -195,6 +196,85 @@ export class Database {
 
     return card.clientId;
   }
+
+  /**
+   * Return clientId and report success or failure on verification
+   * @param cardNumber
+   * @param pin
+   */
+  public async verifyPinByCardNumber(cardNumber: string, pin: string) {
+    await this.ready();
+
+    const card = await this.cardManager.findOne({
+      cardNumber
+    });
+
+    if (card == null || !card.isActivated) {
+      return { 
+        "validCard": false,
+        "message": "NOT_AUTHORISED",
+        "code": 401
+      };
+    }
+
+    if (PinManager.verifyPinHash(pin,card.pin))
+    {
+      return {
+        "validCard" : true,
+        "clientId" : card.clientId
+      };
+    }
+    else
+    {
+      return { 
+        "validCard": true,
+        "message" : "NOT_AUTHORISED" ,
+        "code" : 401,
+        "clientId" : card.clientId
+      };
+
+  }
+}
+
+
+  /**
+   * Return clientId and report success or failure on verification
+   * @param rfid
+   * @param pin
+   */
+public async verifyPinByRfid(rfid: string, pin: string) {
+  await this.ready();
+
+  const card = await this.cardManager.findOne({
+    rfid
+  });
+
+  if (card == null || !card.isActivated) {
+    return { 
+      "validCard": false,
+      "message": "NOT_AUTHORISED",
+      "code": 401
+    };
+  }
+
+  if (PinManager.verifyPinHash(pin, card.pin))
+  {
+    return {
+      "validCard" : true,
+      "clientId" : card.clientId
+    };
+  }
+  else
+  {
+    return { 
+      "validCard": true,
+      "message" : "NOT_AUTHORISED",
+      "code" : 401,
+      "clientId" : card.clientId
+    };
+  }
+
+}
 
   /**
    * Resets the database

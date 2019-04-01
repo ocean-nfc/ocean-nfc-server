@@ -506,9 +506,9 @@ describe("/get-log", () => {
 
 
 /**
- * /verify-pin
+ * /verify-pin-card-number
  */
-describe("/verify-pin", () => {
+describe("/verify-pin-card-number", () => {
   before(done => {
     Server.reset()
       .then(() => {
@@ -526,11 +526,11 @@ describe("/verify-pin", () => {
 		it("should error", (done) => {
 			chai
 				.request(address)
-        .post("/verify-pin")
+        .post("/verify-pin-card-number")
         .send()
 				.then(res => {
           console.log(res.body);
-					expect(res.status).to.equal(400, "error status 400");
+					expect(res.status).to.equal(401, "error status 400");
 					done();
 				});
 		});
@@ -540,7 +540,7 @@ describe("/verify-pin", () => {
 		it("should error", (done) => {
 			chai
 				.request(address)
-        .post("/verify-pin" + makeParams({
+        .post("/verify-pin-card-number" + makeParams({
           clientId: 1,
           pin: "12345"
         }))
@@ -559,7 +559,7 @@ describe("/verify-pin", () => {
       addRandomCard(1, undefined, undefined, "12345").then(() => {
         chai
           .request(address)
-          .post("/verify-pin" + makeParams({
+          .post("/verify-pin-card-number" + makeParams({
             clientId: 1,
             pin: "12345"
           }))
@@ -578,7 +578,7 @@ describe("/verify-pin", () => {
 		it("should succeed, but return invalid", (done) => {
 			chai
 				.request(address)
-        .post("/verify-pin" + makeParams({
+        .post("/verify-pin-card-number" + makeParams({
           clientId: 1,
           pin: "123456"
         }))
@@ -592,6 +592,95 @@ describe("/verify-pin", () => {
 		});
   });
 });
+
+/**
+ * /verify-pin-rfid
+ */
+describe("/verify-pin-rfid", () => {
+  before(done => {
+    Server.reset()
+      .then(() => {
+        server = new Server();
+        return server.start();
+      })
+      .then(done);
+  });
+
+  after(done => {
+    server.stop().then(done);
+  });
+
+	describe("Don't supply parameters", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+        .post("/verify-pin-rfid")
+        .send()
+				.then(res => {
+          console.log(res.body);
+					expect(res.status).to.equal(401, "error status 400");
+					done();
+				});
+		});
+  });
+
+  describe("Check pin for non-existing user", () => {
+		it("should error", (done) => {
+			chai
+				.request(address)
+        .post("/verify-pin-rfid" + makeParams({
+          clientId: 1,
+          pin: "12345"
+        }))
+        .send()
+				.then(res => {
+          console.log(res.body);
+					expect(res.status).to.equal(404, "error status 404");
+					done();
+				});
+		});
+  });
+
+  describe("Check pin for existing user", () => {
+		it("should succeed", (done) => {
+
+      addRandomCard(1, undefined, undefined, "12345").then(() => {
+        chai
+          .request(address)
+          .post("/verify-pin-rfid" + makeParams({
+            clientId: 1,
+            pin: "12345"
+          }))
+          .send()
+          .then(res => {
+            console.log(res.body);
+            expect(res.status).to.equal(200, "error status 200");
+            expect(res.body.valid).to.equal(true);
+            done();
+          });
+        });
+		});
+  });
+
+  describe("Check invalid pin for existing user", () => {
+		it("should succeed, but return invalid", (done) => {
+			chai
+				.request(address)
+        .post("/verify-pin-rfid" + makeParams({
+          clientId: 1,
+          pin: "123456"
+        }))
+        .send()
+				.then(res => {
+          console.log(res.body);
+          expect(res.status).to.equal(200, "error status 200");
+          expect(res.body.valid).to.equal(false);
+					done();
+				});
+		});
+  });
+});
+
 
 /**
  * /update-card-number
