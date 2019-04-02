@@ -2,6 +2,12 @@ import * as jsonfile from "jsonfile";
 import * as axios from "axios";
 import * as fs from "fs";
 
+/**
+ * Saves log items to a log file.
+ * The log file is periodically sent to the reporting subsystem.
+ * When it successfully sends logs to the reporting subsystem, it
+ * removes the locally-stored logs.
+ */
 export class Log {
   private static instance = null;
   public static getInstance(): Log {
@@ -98,55 +104,5 @@ export class Log {
 
   public async reset() {
     await this.initialiseLogFile();
-  }
-}
-
-class Lock {
-  private isLocked = false;
-  private waiting = [];
-  private fn: (...parameters) => Promise<void>;
-
-  costructor(lockedFn: (...parameters) => Promise<void>) {
-    this.fn = lockedFn;
-  }
-
-  public request(...parameters): Promise<any> {
-    return new Promise(async resolve => {
-      const waiter = new ExternalPromise().getPromise();
-
-      if (this.isLocked) {
-        this.waiting.push(waiter);
-        await waiter;
-      }
-
-      this.isLocked = true;
-      await this.fn(...parameters);
-      this.isLocked = false;
-
-      if (this.waiting.length) {
-        this.waiting[0].resolve();
-      }
-
-      resolve();
-    });
-  }
-}
-
-class ExternalPromise {
-  private resolver;
-  private promise;
-
-  constructor() {
-    this.promise = new Promise(resolve => {
-      this.resolver = resolve;
-    });
-  }
-
-  public resolve() {
-    this.resolver();
-  }
-
-  public getPromise() {
-    return this.promise;
   }
 }
