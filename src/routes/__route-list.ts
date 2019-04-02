@@ -1,5 +1,5 @@
 import { VerifyPinByRfidRoute } from "./verify-pin-rfid";
-import { GetClientIdFromCardNumberRoute } from "./get-client-id-from-card-number";
+import { GetClientIdFromCardNumberRoute } from "./client-id-from-card-number";
 import { AddCardRoute } from "./add-card";
 import { DeactByCardNumRoute } from "./deact-by-cardnum";
 import { ListAllRoute } from "./list-all-clients";
