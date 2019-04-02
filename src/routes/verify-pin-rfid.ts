@@ -48,7 +48,7 @@ export class VerifyPinByRfidRoute extends Route {
   async apiFunction(params) {
     const card = await this.db.getByRfid(params.rfid);
 
-    if (card == null) {
+    if (card == null || !card.isActivated) {
       return {
         validCard: false,
         ...new NotAuthorisedException()
