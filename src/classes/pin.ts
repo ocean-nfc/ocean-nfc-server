@@ -64,7 +64,7 @@ export class PinManager {
    * @param salt - Salt if one exists
    * @returns The pin number's hash
    */
-  private static async generatePinHash(
+  public static async generatePinHash(
     pin: string,
     salt?: string
   ): Promise<string> {
