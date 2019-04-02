@@ -1,7 +1,8 @@
 import {
   clientIdValidator,
   exampleValidCard,
-  exampleValidCard2
+  exampleValidPin,
+  exampleValidRfid
 } from "./../classes/validators";
 import { HttpMethod, RouteParam } from "./../classes/route";
 import { Route } from "../classes/route";
@@ -25,19 +26,17 @@ export class AddCardRoute extends Route {
   ];
 
   exampleResponse = {
-    cardNumbers: [exampleValidCard, exampleValidCard2]
+    cardNumbers: [{
+      cardNumber: exampleValidCard,
+      rfid: exampleValidRfid,
+      pin: exampleValidPin
+    }]
   };
 
   protected async apiFunction(params) {
-    
-    const cardNumbers = [];
-
-    for (let i = 0; i < Math.floor(Math.random() * 2) + 1; i++) {
-      cardNumbers.push(await CardManager.createNewCard(params.clientId, true));
-    }
-
-    return {
-      cardNumbers
-    };
+    return [
+      await CardManager.createNewCard(params.clientId),
+      await CardManager.createNewCard(params.clientId, true),
+    ];
   }
 }
