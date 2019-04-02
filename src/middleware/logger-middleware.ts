@@ -1,4 +1,4 @@
-import { Database } from './../classes/database';
+import { Log } from '../classes/log';
 import * as express from "express";
 
 /**
@@ -9,8 +9,14 @@ import * as express from "express";
  */
 export const loggerMiddleware: express.RequestHandler = (req: express.Request, res: express.Response, next: express.NextFunction) => {
   res.on("finish", function() {
+
+    req.originalUrl = req.originalUrl.replace(/pin=\d+/,"pin=undifined");//This is to mask the pin (security purposes)
+
+    if(req.query['pin'] != null)
+      req.query['pin'] = "undifined"; //This is to mask the pin (security purposes)
+
     const logItem = [
-      Math.round(Date.now() / 1000),
+      Date.now(),
       res.statusCode,
       req.method,
       req.originalUrl,
@@ -20,8 +26,8 @@ export const loggerMiddleware: express.RequestHandler = (req: express.Request, r
   
     console.log(logItem.join(" "));
     
-    const db = Database.getInstance();
-    db.addLogItem(logItem[0], logItem[1], logItem[2], logItem[3], logItem[4].toString(), logItem[5]);
+    const log = Log.getInstance();
+    log.addLogItem(logItem);
   })
 
   next();
