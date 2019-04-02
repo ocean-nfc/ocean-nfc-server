@@ -26,7 +26,7 @@ export class Log {
   /**
    * Initialises the json log file
    */
-  public initialiseLogFile() {
+  private initialiseLogFile() {
     const header = { system: "CRDS", data: [] };
     this.writeToLogFile(header);
     console.log("Log file has been initialised.");
@@ -59,6 +59,20 @@ export class Log {
     if (fileObj["data"].length >= 100 && !this.isSendingFile) {
       this.sendLogFile(fileObj);
     }
+  }
+
+  public getLog() {
+    if (!fs.existsSync("./log.json")) {
+      this.initialiseLogFile();
+    }
+
+    var fileObj = jsonfile.readFileSync(this.file);
+
+    return fileObj.data;
+  }
+
+  public getLogLength() {
+    return this.getLog().length;
   }
 
   /**
