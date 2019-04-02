@@ -1,4 +1,4 @@
-import { ClientIdNotFoundException, AuthException } from "./../exceptions";
+import { ClientIdNotFoundException, AuthException, NotAuthorisedException } from "./../exceptions";
 import "reflect-metadata";
 import { createConnection, Connection, Repository } from "typeorm";
 import { ClientCard } from "../models/client-card";
@@ -205,75 +205,6 @@ export class Database {
     }
 
     return card.clientId;
-  }
-  /**
-   * Return clientId and report success or failure on verification
-   * @param rfid
-   * @param pin
-   */
-  public async verifyPinByRfid(rfid: string, pin: string) {
-    await this.ready();
-
-    const card = await this.cardManager.findOne({
-      rfid
-    });
-
-    if (card == null) {
-      return {
-        validCard: false,
-        message: "NOT_AUTHORISED",
-        code: 401
-      };
-    }
-
-    if (card.pin == pin) {
-      return {
-        validCard: true,
-        clientId: card.clientId
-      };
-    } else {
-      return {
-        validCard: true,
-        message: "NOT_AUTHORISED",
-        code: 401,
-        clientId: card.clientId
-      };
-    }
-  }
-
-  /**
-   * Return clientId and report success or failure on verification
-   * @param rfid
-   * @param pin
-   */
-  public async verifyPinByCardNumber(cardNumber: string, pin: string) {
-    await this.ready();
-
-    const card = await this.cardManager.findOne({
-      cardNumber
-    });
-
-    if (card == null) {
-      return {
-        validCard: false,
-        message: "NOT_AUTHORISED",
-        code: 401
-      };
-    }
-
-    if (card.pin == pin) {
-      return {
-        validCard: true,
-        clientId: card.clientId
-      };
-    } else {
-      return {
-        validCard: true,
-        message: "NOT_AUTHORISED",
-        code: 401,
-        clientId: card.clientId
-      };
-    }
   }
 
   /**
