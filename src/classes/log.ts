@@ -1,6 +1,7 @@
 import * as jsonfile from "jsonfile";
 import * as axios from "axios";
 import * as fs from "fs";
+import * as path from "path";
 
 /**
  * Saves log items to a log file.
@@ -17,7 +18,7 @@ export class Log {
     return Log.instance;
   }
 
-  private file = "./log.json";
+  private file = path.join(process.cwd(), "log.json");
 
   private isSendingFile = false;
 
