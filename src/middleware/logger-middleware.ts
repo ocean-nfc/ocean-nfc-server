@@ -1,4 +1,4 @@
-import { Database } from './../classes/database';
+import { Log } from '../classes/log';
 import * as express from "express";
 
 /**
@@ -8,19 +8,27 @@ import * as express from "express";
  * @param next 
  */
 export const loggerMiddleware: express.RequestHandler = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  const logItem = [
-    new Date().getTime(),
-    res.statusCode,
-    req.method,
-    req.originalUrl,
-    JSON.stringify(req.query),
-    req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-  ];
+  res.on("finish", function() {
 
-  console.log(logItem.join(" "));
+    req.originalUrl = req.originalUrl.replace(/pin=\d+/,"pin=undifined");//This is to mask the pin (security purposes)
+
+    if(req.query['pin'] != null)
+      req.query['pin'] = "undifined"; //This is to mask the pin (security purposes)
+
+    const logItem = [
+      Date.now(),
+      res.statusCode,
+      req.method,
+      req.originalUrl,
+      JSON.stringify(req.query),
+      req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+    ];
   
-  const db = Database.getInstance();
-  db.addLogItem(logItem[0], logItem[1], logItem[2], logItem[3], logItem[4].toString(), logItem[5]);
+    console.log(logItem.join(" "));
+    
+    const log = Log.getInstance();
+    log.addLogItem(logItem);
+  })
 
   next();
 }

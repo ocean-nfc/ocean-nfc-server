@@ -1,33 +1,42 @@
-import { Database } from './../classes/database';
-import { NotAllParamsSuppliedException, Exception, ClientAlreadyExistsException } from './../exceptions';
-import * as express from "express";
+import {
+  clientIdValidator,
+  exampleValidCard,
+  exampleValidPin,
+  exampleValidRfid
+} from "./../classes/validators";
+import { HttpMethod, RouteParam } from "./../classes/route";
+import { Route } from "../classes/route";
+import { CardManager } from "../classes/card";
 
-export const addCard: express.RequestHandler = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  const clientId = req.query.clientId;
-  const rfid = req.query.rfid;
-  const pin = req.query.pin;
-  const cardNumber = req.query.cardNumber;
-  if (!clientId || !rfid || !pin || !cardNumber) {
-    return next(new NotAllParamsSuppliedException());
+export class AddCardRoute extends Route {
+  getEndpoint() {
+    return "/add-card";
+  }
+  getMethod() {
+    return HttpMethod.POST;
   }
 
-  // add the information to the database
-  const db: Database = Database.getInstance();
+  parameters = [new RouteParam("clientId", "1", clientIdValidator)];
 
-  try {
-    try {
-      await db.addCard(clientId, rfid, cardNumber, pin);
-    } catch (e) {
-      if (e instanceof ClientAlreadyExistsException) {
-        return next(e);
-      }
-      throw e;
-    }
-  } catch (e) {
-    console.error(e);
-    next(new Exception());
-    return;
+  description = "Assigns a new random card to a client";
+
+  sideEffects = [
+    "Sends a notification containing the generated PIN",
+    "Sends a notification containing the generated card number/rfid"
+  ];
+
+  exampleResponse = {
+    cardNumbers: [{
+      cardNumber: exampleValidCard,
+      rfid: exampleValidRfid,
+      pin: exampleValidPin
+    }]
+  };
+
+  protected async apiFunction(params) {
+    return [
+      await CardManager.createNewCard(params.clientId),
+      await CardManager.createNewCard(params.clientId, true),
+    ];
   }
-
-  res.json();
 }
