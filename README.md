@@ -56,7 +56,7 @@ This will cause the server to use sqlite instead of postgres (for local developm
 - __Attitudes__: Ambitious, Determined to improve my skillset and Invested in self education
 
 
-### Johan Nel	- 16354029
+### Johan Nel - 16354029
 <a href="https://github.com/Jtfnel" target="_blank">GitHub</a>
 - __Interests__: Web Development, Aviation, Cars, Movies, Music, Photography and Traveling
 - __Skills__: Java, C++, PHP, Javascript, HTML, CSS, Angular, SQL and Computer Networks
