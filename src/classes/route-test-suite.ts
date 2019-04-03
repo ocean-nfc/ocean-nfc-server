@@ -174,7 +174,7 @@ export class RouteTestSuite {
 
 interface RouteTest {
   name: string;
-  params: {[param: string]: string};
+  params: {[param: string]: any};
   test: (response: Response, expect: Chai.ExpectStatic, db: Database) => Promise<void>;
   preamble?: (db: Database) => Promise<void>;
 }
