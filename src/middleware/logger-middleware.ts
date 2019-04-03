@@ -20,7 +20,10 @@ export const loggerMiddleware: express.RequestHandler = (req: express.Request, r
       res.statusCode,
       req.method,
       req.originalUrl,
-      JSON.stringify(req.query),
+      JSON.stringify({
+        ...req.query,
+        ...req.body
+      }),
       req.headers['x-forwarded-for'] || req.connection.remoteAddress,
     ];
   
