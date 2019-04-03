@@ -48,11 +48,11 @@ export abstract class Route {
 
     // validate that all of the parameters have been given
     for (const param of this.parameters) {
-      let paramValue = req.query[param.getName()];
+      let paramValue = req.body[param.getName()];
 
       // throw an error if the parameter has not been given
       if (typeof paramValue === "undefined") {
-        paramValue = req.body[param.getName()];
+        paramValue = req.query[param.getName()];
       }
 
       if (typeof paramValue === "undefined") {
