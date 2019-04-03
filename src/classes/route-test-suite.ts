@@ -145,7 +145,7 @@ export class RouteTestSuite {
     try {
       const res = await method
         .call(req, url)
-        .send();
+        .send(params);
 
       return res;
     } catch (e) {
