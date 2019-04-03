@@ -4,6 +4,6 @@ dotenv.config();
 
 export const config = {
   port: process.env.PORT || 3000,
-  developmentMode: (process.env.NODE_ENV != "development"),
+  developmentMode: process.env.NODE_ENV == "development",
   deploymentUrl: "https://oceannfc.herokuapp.com",
 };
