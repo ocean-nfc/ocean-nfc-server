@@ -38,7 +38,7 @@ export class Log {
    * @param logData
    */
   public addLogItem(logData) {
-    if (!fs.existsSync("./log.json")) {
+    if (!fs.existsSync(this.file)) {
       this.initialiseLogFile();
     }
 
@@ -63,7 +63,7 @@ export class Log {
   }
 
   public getLog() {
-    if (!fs.existsSync("./log.json")) {
+    if (!fs.existsSync(this.file)) {
       this.initialiseLogFile();
     }
 
@@ -81,7 +81,7 @@ export class Log {
    * @param jsonObj
    */
   private writeToLogFile(jsonObj) {
-    jsonfile.writeFileSync(this.file, jsonObj, { flag: "w" }, function(err) {
+    jsonfile.writeFileSync(this.file, jsonObj, { flag: "w+" }, function(err) {
       if (err) console.error(err);
     });
   }
