@@ -1,11 +1,16 @@
-import { CardManager } from './../classes/card';
+import { CardManager } from "./../classes/card";
 import {
   exampleValidClientId,
-  clientIdValidator
+  clientIdValidator,
+  exampleValidClientId2,
+  exampleValidCard,
+  exampleValidRfid,
+  exampleValidPin
 } from "./../classes/validators";
 import { RouteParam } from "./../classes/route";
 import { HttpMethod } from "../classes/route";
 import { Route } from "../classes/route";
+import { ClientIdNotFoundException } from "../exceptions";
 
 export class UpdateClientRoute extends Route {
   getEndpoint() {
@@ -16,7 +21,13 @@ export class UpdateClientRoute extends Route {
   }
 
   parameters = [
-    new RouteParam("ID", exampleValidClientId, clientIdValidator),
+    new RouteParam(
+      "IDS",
+      `["${exampleValidClientId}", "${exampleValidClientId2}"]`,
+      async val => {
+        return Array.isArray(val);
+      }
+    ),
     new RouteParam(
       "Operation",
       "CREATE",
@@ -28,22 +39,44 @@ export class UpdateClientRoute extends Route {
     To be called by Client Information System.`;
 
   exampleResponses = [
+    [
+      {
+        clientId: exampleValidClientId,
+        cardNumber: exampleValidCard,
+        rfid: exampleValidRfid,
+        pin: exampleValidPin
+      }
+    ],
     {
-      success: true
-    },
-    {
-      success: false
+      ...new ClientIdNotFoundException()
     }
   ];
 
   async apiFunction(params) {
     console.log("UPDATE PARAMS", params);
+
     if (params.Operation == "DELETE") {
-      await this.db.removeCard("clientId", params.ID);
+      for (const id of params.IDS) {
+        await this.db.removeCard("clientId", id);
+      }
     }
-    if (params.Operation == "CREATE") {
-      await CardManager.createNewCard(params.ID);
-      await CardManager.createNewCard(params.ID, true);
+    else if (params.Operation == "CREATE") {
+      const res = [];
+
+      for (const id of params.IDS) {
+        res.push({
+          ...await CardManager.createNewCard(id),
+          clientId: id
+        });
+        res.push({
+          ...await CardManager.createNewCard(id, true),
+          clientId: id
+        });
+      }
+
+      return {
+        cards: res
+      };
     }
   }
 }
