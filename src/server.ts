@@ -16,6 +16,8 @@ export class Server {
   public async start() {
     this.app = express();
 
+    this.app.use(express.json());
+
     this.registerMiddleware();
     this.registerRoutes();
     this.app.use(errorHandler);

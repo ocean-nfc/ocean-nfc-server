@@ -47,7 +47,7 @@ export class VerifyPinByCardNumberRoute extends Route {
   async apiFunction(params) {
     const card = await this.db.getByCardNumber(params.cardNumber);
 
-    if (card == null) {
+    if (card == null || !card.isActivated) {
       return {
         validCard: false,
         ...new NotAuthorisedException()
