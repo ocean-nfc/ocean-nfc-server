@@ -7,6 +7,7 @@ import { DeactByClientIdRoute } from "./deact-by-clientId";
 import { DeactByRfidRoute } from "./deact-by-rfid";
 import { VerifyPinByCardNumberRoute } from "./verify-pin-card-number";
 import { GetClientIdFromRfidNumberRoute } from "./client-id-from-rfid";
+import { UpdateClientRoute } from "./update-client";
 
 /**
  * List of all routes to be registered by the server.
@@ -28,5 +29,7 @@ export const routes = [
   new DeactByRfidRoute(),
 
   new VerifyPinByCardNumberRoute(),
-  new VerifyPinByRfidRoute()
+  new VerifyPinByRfidRoute(),
+
+  new UpdateClientRoute()
 ];
