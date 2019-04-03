@@ -1,4 +1,4 @@
-import { exampleValidClientId } from './../classes/validators';
+import { exampleValidClientId, exampleValidClientId2 } from './../classes/validators';
 import { UpdateClientRoute } from './update-client';
 import { RouteTestSuite } from './../classes/route-test-suite';
 
@@ -7,7 +7,7 @@ new RouteTestSuite(new UpdateClientRoute())
   .add({
     name: "Add cards when client is added",
     params: {
-      ID: exampleValidClientId,
+      IDS: [exampleValidClientId],
       Operation: "CREATE"
     },
     test: async (res, expect, db) => {
@@ -19,7 +19,7 @@ new RouteTestSuite(new UpdateClientRoute())
   .add({
     name: "Deactivate cards when client is removed",
     params: {
-      ID: exampleValidClientId,
+      IDS: [exampleValidClientId],
       Operation: "DELETE"
     },
     test: async (res, expect, db) => {
