@@ -1,7 +1,6 @@
 import * as jsonfile from "jsonfile";
 import * as axios from "axios";
 import * as fs from "fs";
-import * as path from "path";
 
 /**
  * Saves log items to a log file.
@@ -18,7 +17,7 @@ export class Log {
     return Log.instance;
   }
 
-  private file = path.join(process.cwd(), "log.json");
+  private file = "./log.json";
 
   private isSendingFile = false;
 
@@ -38,7 +37,7 @@ export class Log {
    * @param logData
    */
   public addLogItem(logData) {
-    if (!fs.existsSync(this.file)) {
+    if (!fs.existsSync("./log.json")) {
       this.initialiseLogFile();
     }
 
@@ -63,7 +62,7 @@ export class Log {
   }
 
   public getLog() {
-    if (!fs.existsSync(this.file)) {
+    if (!fs.existsSync("./log.json")) {
       this.initialiseLogFile();
     }
 
@@ -81,7 +80,7 @@ export class Log {
    * @param jsonObj
    */
   private writeToLogFile(jsonObj) {
-    jsonfile.writeFileSync(this.file, jsonObj, { flag: "w+" }, function(err) {
+    jsonfile.writeFileSync(this.file, jsonObj, { flag: "w" }, function(err) {
       if (err) console.error(err);
     });
   }

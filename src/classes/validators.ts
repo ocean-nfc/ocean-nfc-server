@@ -8,7 +8,6 @@ export const clientIdValidator = async (clientId: string) => {
   return isNumber(clientId);
 }
 export const exampleValidClientId = "1";
-export const exampleValidClientId2 = "999";
 
 export const cardValidator = async (card: string) => {
   return CardManager.isCardNumberValid(card);
