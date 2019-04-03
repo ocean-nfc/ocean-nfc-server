@@ -55,7 +55,6 @@ This will cause the server to use sqlite instead of postgres (for local developm
   - Promoter Peoples magazine,Camel,Big Burst marketing
 - __Attitudes__: Ambitious, Determined to improve my skillset and Invested in self education
 
-
 ### Johan Nel - 16354029
 <a href="https://github.com/Jtfnel" target="_blank">GitHub</a>
 - __Interests__: Web Development, Aviation, Cars, Movies, Music, Photography and Traveling
@@ -80,5 +79,5 @@ This will cause the server to use sqlite instead of postgres (for local developm
 - __Previous work experience__: 
   - Tourguide at Ecolife Expiditions
   - Bartender at Serve Co
-  - Events coordinator at Ghaton Events  
+  - Events coordinator at Ghaton Events
 - __Attitudes__: Living a full life, positive outlook on the future, go getter, creative, curious
