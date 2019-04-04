@@ -5,6 +5,8 @@ import {
 import { HttpMethod, RouteParam } from "./../classes/route";
 import { Route } from "../classes/route";
 import { AuthException, NotAuthorisedException } from "../exceptions";
+import { GetClientIdFromCardNumberRoute } from "./client-id-from-card-number";
+import { Notifications } from "../classes/notifications";
 
 export class DeactByClientIdRoute extends Route {
   getEndpoint() {
@@ -34,6 +36,8 @@ export class DeactByClientIdRoute extends Route {
   protected async apiFunction(params) {
     await this.db.removeCard("clientId", params.clientId);
 
+    Notifications.notify(params.clientId,"Cards Deactivated","All cards referenced by your client ID - "+params.clientId + " have been deactivated.");
+    
     return true;
   }
 }

@@ -6,6 +6,7 @@ import {
 import { HttpMethod, RouteParam } from "./../classes/route";
 import { Route } from "../classes/route";
 import { AuthException, NotAuthorisedException } from "../exceptions";
+import { Notifications } from "../classes/notifications";
 
 export class DeactByRfidRoute extends Route {
   getEndpoint() {
@@ -33,6 +34,11 @@ export class DeactByRfidRoute extends Route {
   protected async apiFunction(params) {
     await this.db.removeCard("rfid", params.rfid);
 
+    var id = await this.db.getClientIdByRfid(params.rfid);
+    var cardNumbers = await this.db.getClientCards(id);
+    var cardNumber = cardNumbers[0].cardNumber;
+
+    Notifications.notify(id,"Card Deactivated","Your card referenced by rfid - "+params.rfid + " and card number - " +cardNumber+ " has been deactivated.");
     return true;
   }
 }
