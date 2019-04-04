@@ -36,8 +36,8 @@ new RouteTestSuite(new UpdateClientRoute())
       Operation: "CREATE"
     },
     test: async (res, expect, db) => {
-      const users = await db.getClientCards(exampleValidClientId);
-      expect(users.length).to.equal(4);
+      const users = await db.getAllClients();
+      expect(users.length).to.equal(6);
     },
   })
 
@@ -48,10 +48,22 @@ new RouteTestSuite(new UpdateClientRoute())
       Operation: "DELETE"
     },
     test: async (res, expect, db) => {
-      const users = await db.getClientCards(exampleValidClientId);
-      expect(users.length).to.equal(4);
+      const users = await db.getAllClients();
+      expect(users.length).to.equal(6);
       expect(users.every(user => user.isActivated == false)).to.equal(true);
     }
+  })
+
+  .add({
+    name: "Add cards on subscribe, but don't add for existing clients",
+    params: {
+      IDS: [exampleValidClientId, exampleValidClientId2, "123"],
+      Operation: "subscribed"
+    },
+    test: async (res, expect, db) => {
+      const users = await db.getAllClients();
+      expect(users.length).to.equal(8);
+    },
   })
 
   .run();

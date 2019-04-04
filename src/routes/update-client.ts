@@ -1,7 +1,6 @@
 import { CardManager } from "./../classes/card";
 import {
   exampleValidClientId,
-  clientIdValidator,
   exampleValidClientId2,
   exampleValidCard,
   exampleValidRfid,
@@ -31,7 +30,7 @@ export class UpdateClientRoute extends Route {
     new RouteParam(
       "Operation",
       "CREATE",
-      async val => val == "CREATE" || val == "DELETE"
+      async val => val == "CREATE" || val == "DELETE" || val == "subscribed"
     )
   ];
 
@@ -55,21 +54,33 @@ export class UpdateClientRoute extends Route {
   async apiFunction(params) {
     console.log("UPDATE PARAMS", params);
 
+    const isSubscribing = params.Operation == "subscribed";
+    console.log("SUBBING", isSubscribing);
+
     if (params.Operation == "DELETE") {
       for (const id of params.IDS) {
         await this.db.removeCard("clientId", id);
       }
-    }
-    else if (params.Operation == "CREATE") {
+    } else if (params.Operation == "CREATE" || isSubscribing) {
       const res = [];
 
-      for (const id of params.IDS) {
+      const existingCards = isSubscribing
+        ? (await this.db.getAllClients())
+            .map(cardId => cardId.clientId)
+            .filter((cardId, index, arr) => arr.indexOf(cardId) == index)
+        : [];
+
+      const cards = params.IDS.filter(
+        cardId => existingCards.indexOf(cardId) == -1
+      );
+
+      for (const id of cards) {
         res.push({
-          ...await CardManager.createNewCard(id),
+          ...(await CardManager.createNewCard(id)),
           clientId: id
         });
         res.push({
-          ...await CardManager.createNewCard(id, true),
+          ...(await CardManager.createNewCard(id, true)),
           clientId: id
         });
       }
