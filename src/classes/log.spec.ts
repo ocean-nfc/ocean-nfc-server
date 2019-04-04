@@ -12,7 +12,7 @@ import "mocha";
 
 const removeLog = () => {
   try {
-    fs.unlinkSync("log.json");
+    fs.unlinkSync("logfile.json");
   } catch (e) {}
 }
 
@@ -39,7 +39,7 @@ describe("Log tests", () => {
       timestamp: Date.now()
     }]);
 
-    expect(fs.existsSync("log.json")).to.equal(true);
+    expect(fs.existsSync("logfile.json")).to.equal(true);
   });
 
   it("Should add logs to logfile", () => {
