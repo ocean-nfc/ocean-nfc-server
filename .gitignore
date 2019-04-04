@@ -4,5 +4,6 @@
 /npm-debug.log
 /.env
 /log.json
+/logfile.json
 /dist
 Thumbs.db

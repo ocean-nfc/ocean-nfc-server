@@ -81,6 +81,7 @@ export class Database {
   }
 
   public async getAllClients(): Promise<ClientCard[]> {
+    await this.ready();
     return await this.cardManager.find();
   }
 

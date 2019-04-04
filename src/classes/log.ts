@@ -18,7 +18,7 @@ export class Log {
     return Log.instance;
   }
 
-  private file = path.join(process.cwd(), "log.json");
+  private file = path.join(process.cwd(), "logfile.json");
 
   private isSendingFile = false;
 
