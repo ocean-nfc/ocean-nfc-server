@@ -5,7 +5,6 @@ import { PinManager } from "./pin";
  * This class is used to create, read, update and deactivate client's bank cards.
  */
 export class CardManager {
-
   /**
    * Array of valid FNB Credit Card BINs
    *
@@ -22,10 +21,8 @@ export class CardManager {
    *
    * @type string
    */
-  private static readonly FnbDebitCardBins: string[] = [
-    "419570"
-  ];
-  
+  private static readonly FnbDebitCardBins: string[] = ["419570"];
+
   /**
    * Generates a new bank card and save it to the database with the client's ID.
    *
@@ -33,23 +30,24 @@ export class CardManager {
    * @param credit - Credit card or not
    * @returns The new card number
    */
-  public static async createNewCard(
-    clientID: string,
-    credit: boolean
-  ): Promise<string> {
-    let number = await this.generateNewCard(credit);
-    let rfid: string;
-    if(Boolean(Math.round(Math.random()))){
-      rfid = await this.generateRfIDNumber();
-    }else{
-      rfid = null;
-    }
-    let pinhash = await PinManager.createNewPin(clientID);
-    let db = Database.getInstance();
-    
-    await db.addCard(clientID, rfid, number, pinhash);
+  public static async createNewCard(clientID: string, hasRfid = false): Promise<{
+    cardNumber: string,
+    rfid: string,
+    pin: string
+  }> {
+    let number = await this.generateNewCard(Boolean(Math.round(Math.random())));
+    let rfid = hasRfid ? await this.generateRfIDNumber() : null;
 
-    return number;
+    const { pin, hash } = await PinManager.createNewPin();
+    let db = Database.getInstance();
+
+    await db.addCard(clientID, rfid, number, hash);
+
+    return {
+      cardNumber: number,
+      rfid: rfid,
+      pin: pin
+    };
   }
 
   /**
@@ -207,7 +205,7 @@ export class CardManager {
 
   /**
    * Checks whether or not the rfid number exists.
-   * 
+   *
    * @param number - The rfid number to check
    * @returns Whether or not the card exists
    */
@@ -218,16 +216,16 @@ export class CardManager {
 
     return rfid != null;
   }
-  
+
   /**
-   * Generates a valid new rfid number 
-   * 
+   * Generates a valid new rfid number
+   *
    * @returns The new rfid number
    */
   private static async generateRfIDNumber(): Promise<string> {
     let number: string;
     let valid = false;
-    while(!valid){
+    while (!valid) {
       let min = 10000000;
       let max = 99999999;
       let random = Math.floor(Math.random() * max + min);
@@ -238,5 +236,4 @@ export class CardManager {
     }
     return number;
   }
-
 }

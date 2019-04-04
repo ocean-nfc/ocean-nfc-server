@@ -2,11 +2,12 @@ import {
   exampleValidCard,
   cardValidator,
   exampleValidPin,
-  pinValidator,
-  exampleValidClientId
+  pinValidator
 } from "./../classes/validators";
 import { HttpMethod, RouteParam } from "./../classes/route";
 import { Route } from "../classes/route";
+import { NotAuthorisedException } from "../exceptions";
+import { PinManager } from "../classes/pin";
 
 export class VerifyPinByCardNumberRoute extends Route {
   getEndpoint() {
@@ -25,26 +26,45 @@ export class VerifyPinByCardNumberRoute extends Route {
   ];
 
   exampleResponses = [
-    { // card doesn't exist
+    {
+      // card doesn't exist
       validCard: false,
-      ...new NotAuthorisedException() ,
-      code: 401
+      ...new NotAuthorisedException()
     },
-    { // card exists, incorrect pin
+    {
+      // card exists, incorrect pin
       validCard: true,
       ...new NotAuthorisedException(),
-      code: 401,
       clientId: "1"
     },
-    { // card exists, correct pin
+    {
+      // card exists, correct pin
       validCard: true,
       clientId: "1"
     }
   ];
 
   async apiFunction(params) {
-    const res = await this.db.verifyPinByCardNumber(params.cardNumber,params.pin);
+    const card = await this.db.getByCardNumber(params.cardNumber);
 
-    return res;
+    if (card == null || !card.isActivated) {
+      return {
+        validCard: false,
+        ...new NotAuthorisedException()
+      };
+    }
+
+    if (await PinManager.verifyPinHash(params.pin, card.pin)) {
+      return {
+        validCard: true,
+        clientId: card.clientId
+      };
+    }
+
+    return {
+      validCard: true,
+      ...new NotAuthorisedException(),
+      clientId: card.clientId
+    };
   }
 }

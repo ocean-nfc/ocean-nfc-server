@@ -7,7 +7,6 @@ import {
 } from "./../classes/validators";
 import { RouteTestSuite } from "../classes/route-test-suite";
 import { DeactByRfidRoute } from "./deact-by-rfid";
-import { AddCardRoute } from "./add-card";
 
 new RouteTestSuite(new DeactByRfidRoute())
   .testMissingParameters()
@@ -30,7 +29,6 @@ new RouteTestSuite(new DeactByRfidRoute())
     test: async (res, expect, db) => {
       expect(res.status).to.equal(200);
       try {
-        await db.removeCard("rfid", exampleValidRfid);
         var cards = await db.getClientCards(exampleValidClientId);
       } catch (e) {
         console.log(e);

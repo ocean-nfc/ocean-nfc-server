@@ -1,9 +1,8 @@
-import { ClientIdNotFoundException } from "./../exceptions";
+import { ClientIdNotFoundException, AuthException, NotAuthorisedException } from "./../exceptions";
 import "reflect-metadata";
 import { createConnection, Connection, Repository } from "typeorm";
 import { ClientCard } from "../models/client-card";
 import { config } from "../config";
-import { PinManager } from "./pin";
 
 export class Database {
   private connection: Connection;
@@ -139,10 +138,21 @@ export class Database {
       });
     }
 
+    var activeCardFound = false;  // effectively makes no diff but you shouldnt be able to deactivate a deactivated card
+
     for (const card of cards) {
-      card.isActivated = false;
-      await this.cardManager.save(card);
+
+      if(card.isActivated == true){ //check if at least 1/2 cards were active
+
+        activeCardFound = true;
+        card.isActivated = false;
+        await this.cardManager.save(card);
+      }
+      
     }
+
+    if(activeCardFound == false)
+    throw new AuthException({"Error": "Card already deactivated"});
   }
 
   public async getByCardNumber(cardNumber) {
@@ -196,163 +206,6 @@ export class Database {
 
     return card.clientId;
   }
-  /**
-   * Return clientId and report success or failure on verification
-   * @param rfid 
-   * @param pin
-   */
-  public async verifyPinByRfid(rfid: string, pin: string) {
-    await this.ready();
-
-    const card = await this.cardManager.findOne({
-      rfid
-    });
-
-    if (card == null) {
-      return { 
-        "validCard": false,
-        "message": "NOT_AUTHORISED",
-        "code": 401
-      };
-    }
-
-    if (card.pin == pin)
-    {
-      return {
-        "validCard" : true,
-        "clientId" : card.clientId
-      };
-    }
-    else
-    {
-      return { 
-        "validCard": true,
-        "message" : "NOT_AUTHORISED",
-        "code" : 401,
-        "clientId" : card.clientId
-      };
-    }
-
-  }
-
-    /**
-   * Return clientId and report success or failure on verification
-   * @param rfid 
-   * @param pin
-   */
-  public async verifyPinByCardNumber(cardNumber: string, pin: string) {
-    await this.ready();
-
-    const card = await this.cardManager.findOne({
-      cardNumber
-    });
-
-    if (card == null) {
-      return { 
-        "validCard": false,
-        "message": "NOT_AUTHORISED",
-        "code": 401
-      };
-    }
-
-    if (card.pin == pin)
-    {
-      return {
-        "validCard" : true,
-        "clientId" : card.clientId
-      };
-    }
-    else
-    {
-      return { 
-        "validCard": true,
-        "message" : "NOT_AUTHORISED" ,
-        "code" : 401,
-        "clientId" : card.clientId
-      };
-
-  }
-
-}
-
-  /**
-   * Return clientId and report success or failure on verification
-   * @param cardNumber
-   * @param pin
-   */
-  public async verifyPinByCardNumber(cardNumber: string, pin: string) {
-    await this.ready();
-
-    const card = await this.cardManager.findOne({
-      cardNumber
-    });
-
-    if (card == null || !card.isActivated) {
-      return { 
-        "validCard": false,
-        "message": "NOT_AUTHORISED",
-        "code": 401
-      };
-    }
-
-    if (PinManager.verifyPinHash(pin,card.pin))
-    {
-      return {
-        "validCard" : true,
-        "clientId" : card.clientId
-      };
-    }
-    else
-    {
-      return { 
-        "validCard": true,
-        "message" : "NOT_AUTHORISED" ,
-        "code" : 401,
-        "clientId" : card.clientId
-      };
-
-  }
-}
-
-
-  /**
-   * Return clientId and report success or failure on verification
-   * @param rfid
-   * @param pin
-   */
-public async verifyPinByRfid(rfid: string, pin: string) {
-  await this.ready();
-
-  const card = await this.cardManager.findOne({
-    rfid
-  });
-
-  if (card == null || !card.isActivated) {
-    return { 
-      "validCard": false,
-      "message": "NOT_AUTHORISED",
-      "code": 401
-    };
-  }
-
-  if (PinManager.verifyPinHash(pin, card.pin))
-  {
-    return {
-      "validCard" : true,
-      "clientId" : card.clientId
-    };
-  }
-  else
-  {
-    return { 
-      "validCard": true,
-      "message" : "NOT_AUTHORISED",
-      "code" : 401,
-      "clientId" : card.clientId
-    };
-  }
-
-}
 
   /**
    * Resets the database

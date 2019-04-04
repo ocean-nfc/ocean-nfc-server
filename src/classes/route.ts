@@ -1,5 +1,5 @@
-import { Database } from './database';
-import { InvalidParamSuppliedException, Exception } from './../exceptions';
+import { Database } from "./database";
+import { InvalidParamSuppliedException, Exception } from "./../exceptions";
 import * as express from "express";
 import { NotAllParamsSuppliedException } from "../exceptions";
 
@@ -17,7 +17,7 @@ export abstract class Route {
   /// the method of the endpoint (HttpMethod: GET or POST)
   abstract getMethod(): HttpMethod;
   /// an example response. Must be a JSON object.
-  exampleResponses: Array<{[s: string]: any}> = [];
+  exampleResponses: Array<{ [s: string]: any }> = [];
   /// list of parameters the route expects
   parameters: RouteParam[] = [];
   /// description of what this route does
@@ -29,39 +29,51 @@ export abstract class Route {
 
   /**
    * Registers the route on the application
-   * @param app 
+   * @param app
    */
   public register(app: express.Application) {
     const registerFn = this.getMethod() == HttpMethod.GET ? app.get : app.post;
     registerFn.call(app, this.getEndpoint(), this.route);
   }
-  
+
   /**
    * The route function passed to Express
    */
-  private route = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  private route = async (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
     const params = {};
 
     // validate that all of the parameters have been given
     for (const param of this.parameters) {
-      const paramValue = req.query[param.getName()];
+      let paramValue = req.body[param.getName()];
 
       // throw an error if the parameter has not been given
-      if (typeof paramValue === 'undefined') {
-        return next(new NotAllParamsSuppliedException({
-          parameter: param.getName(),
-          example: param.getExample()
-        }));
+      if (typeof paramValue === "undefined") {
+        paramValue = req.query[param.getName()];
+      }
+
+      if (typeof paramValue === "undefined") {
+        return next(
+          new NotAllParamsSuppliedException({
+            parameter: param.getName(),
+            example: param.getExample()
+          })
+        );
       }
 
       // validate that the parameter is valid
       const isValid = await param.isValid(paramValue);
       if (!isValid) {
-        return next(new InvalidParamSuppliedException({
-          parameter: param.getName(),
-          value: paramValue,
-          example: param.getExample()
-        }));
+        return next(
+          new InvalidParamSuppliedException({
+            parameter: param.getName(),
+            value: paramValue,
+            example: param.getExample()
+          })
+        );
       }
 
       params[param.getName()] = paramValue;
@@ -75,7 +87,7 @@ export abstract class Route {
       console.log(e);
       next(e);
     }
-  }
+  };
 
   /**
    * Defines the functionality that the route performs.
@@ -83,16 +95,17 @@ export abstract class Route {
    * @param params Object containing the parameters of the request. Only includes
    * parameters that are included in the parameters array.
    */
-  protected abstract async apiFunction(params: {[key: string]: string}): Promise<any>;
+  protected abstract async apiFunction(params: {
+    [key: string]: string;
+  }): Promise<any>;
 }
-
 
 /**
  * Route parameter class for Route
  */
 export class RouteParam {
   /**
-   * 
+   *
    * @param name The name of the parameter (provided in the HTTP request)
    * @param validator An asynchronous function that validates whether the parameter is valid
    */

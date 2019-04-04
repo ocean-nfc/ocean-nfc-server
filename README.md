@@ -1,4 +1,4 @@
-# Ocean NFC Server (Group 14)
+# Ocean NFC Server (Group 14) [![Build Status](https://travis-ci.org/ocean-nfc/ocean-nfc-server.svg?branch=master)](https://travis-ci.org/ocean-nfc/ocean-nfc-server)
 
 <a href="https://oceannfc.herokuapp.com/" target="_blank">Ocean NFC API Server</a> *Please see for API documentation
 
@@ -55,9 +55,8 @@ This will cause the server to use sqlite instead of postgres (for local developm
   - Promoter Peoples magazine,Camel,Big Burst marketing
 - __Attitudes__: Ambitious, Determined to improve my skillset and Invested in self education
 
-
-### Johan Nel	- 16354029
-<a href="https://github.com/Jtfnel" target="_blank">GitHub</a>, <a href="https://www.linkedin.com/in/johantfnel/" target="_blank">LinkedIn</a>
+### Johan Nel - 16354029
+<a href="https://github.com/Jtfnel" target="_blank">GitHub</a>
 - __Interests__: Web Development, Aviation, Cars, Movies, Music, Photography and Traveling
 - __Skills__: Java, C++, PHP, Javascript, HTML, CSS, Angular, SQL and Computer Networks
 - __Previous work experience__:
@@ -74,14 +73,11 @@ This will cause the server to use sqlite instead of postgres (for local developm
 - __Attitudes__:  I know what I want in life and what to do to get it. I&#39;m determined to succeed in all that I do. Aware of my weaknesses, but very much willing to make full use of my strengths. Confident and Honest
 
 ### Dewald van Hoven - 15030378
-<a href="https://github.com/u15030378" target="_blank">GitHub</a>, <a href="https://www.linkedin.com/in/dewald-van-hoven-6a8921130/" target="_blank">LinkedIn</a>
+<a href="https://github.com/u15030378" target="_blank">GitHub</a>
 - __Interests__: Practical application of computer systems,  Business solutions, Business, Networks, Music, Events, Wildlife, Philosophy, World History
-
 - __Skills__: C++, Java, LAMP Stack, HTML, CSS, JavaScript, Psychology up to second year level, Philosophy up to third year level, Sales, Tour guiding, Events coordination, Bartending
-
 - __Previous work experience__: 
-    - Tourguide at Ecolife Expiditions
-    - Bartender at Serve Co
-    - Events coordinator at Ghaton Events
-    
+  - Tourguide at Ecolife Expiditions
+  - Bartender at Serve Co
+  - Events coordinator at Ghaton Events
 - __Attitudes__: Living a full life, positive outlook on the future, go getter, creative, curious

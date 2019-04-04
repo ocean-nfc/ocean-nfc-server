@@ -55,7 +55,12 @@ export class RouteTestSuite {
             if (test.preamble) await test.preamble(Database.getInstance());
 
             const res = await RouteTestSuite.request(this.route, test.params);
-            await test.test(res, expect, Database.getInstance());
+            try {
+              await test.test(res, expect, Database.getInstance());
+            } catch (e) {
+              console.error(e);
+              process.exit(1);
+            }
 
             done();
           })();
@@ -145,7 +150,7 @@ export class RouteTestSuite {
     try {
       const res = await method
         .call(req, url)
-        .send();
+        .send(params);
 
       return res;
     } catch (e) {
@@ -169,7 +174,7 @@ export class RouteTestSuite {
 
 interface RouteTest {
   name: string;
-  params: {[param: string]: string};
+  params: {[param: string]: any};
   test: (response: Response, expect: Chai.ExpectStatic, db: Database) => Promise<void>;
   preamble?: (db: Database) => Promise<void>;
 }

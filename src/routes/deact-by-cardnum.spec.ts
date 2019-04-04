@@ -8,8 +8,6 @@ import {
 import { RouteTestSuite } from "../classes/route-test-suite";
 import { DeactByCardNumRoute } from "./deact-by-cardnum";
 
-console.log("DEACTIVATE BY CARD NUM");
-
 new RouteTestSuite(new DeactByCardNumRoute())
   .testMissingParameters()
   .testInvalidParameters()
