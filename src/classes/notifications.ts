@@ -1,4 +1,5 @@
 import * as axios from "axios";
+import { config } from "../config";
 
 /**
  * This class is used to interact with the Notifications system.
@@ -21,7 +22,11 @@ export class Notifications {
    * @returns Whether or not the notification was sent
    */
   public static async notify(clientID: string, subject: string, message: string): Promise<boolean> {
-    let config = {
+    if(config.notify){
+      return true;
+    }
+    
+    let requestConfig = {
       headers: {
         "Content-Type": 'application/json'
       }
@@ -35,13 +40,14 @@ export class Notifications {
 
     let success = false;
 
-    await axios.default.post(this.url + "/notify", data, config)
+    await axios.default.post(this.url + "/notify", data, requestConfig)
     .then(response =>{
       if(response.status == 200){
         success = true;
       }
     })
     .catch(error => {
+      //console.log(error);
       console.error("Notification Error - ", error.status, " ", error.data);
       success = false;
     });

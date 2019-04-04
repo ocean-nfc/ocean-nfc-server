@@ -3,12 +3,13 @@ import "mocha";
 import { expect } from "chai";
 import { CardManager } from "./card"
 import { ClientCard } from "../models/client-card";
+import { exampleValidClientId } from './../classes/validators';
   
 const db = Database.getInstance();
   
 describe("Card class unit tests", () => {
 
-  let clientID = "2011";//TODO: Modify to recieve a valid client from CIS
+  let clientID = exampleValidClientId;
 
   it("Should create a valid card number", done => {
     (async () => {
