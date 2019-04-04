@@ -530,7 +530,7 @@ describe("/verify-pin-card-number", () => {
         .send()
 				.then(res => {
           console.log(res.body);
-					expect(res.status).to.equal(401, "error status 400");
+					expect(res.status).to.equal(400, "error status 400");
 					done();
 				});
 		});
@@ -547,7 +547,7 @@ describe("/verify-pin-card-number", () => {
         .send()
 				.then(res => {
           console.log(res.body);
-					expect(res.validCard , res.code , res.message).to.equal(false, 401, "NOT AUTHORISED");
+					expect(res.status).to.equal(400, "error status 400");
 					done();
 				});
 		});
@@ -566,8 +566,7 @@ describe("/verify-pin-card-number", () => {
           .send()
           .then(res => {
             console.log(res.body);
-            expect(res.validCard , res.clientId).to.equal(true, 1);
-            expect(res.body.valid).to.equal(true);
+            expect(res.status).to.equal(200, "error status 200");
             done();
           });
         });
@@ -585,8 +584,7 @@ describe("/verify-pin-card-number", () => {
         .send()
 				.then(res => {
           console.log(res.body);
-          expect(res.validCard, res.message, res.code, res.clientId).to.equal(true, "NOT_AUTHORISED", 401, 1);
-          expect(res.body.valid).to.equal(false);
+          expect(res.status).to.equal(400, "error status 400");
 					done();
 				});
 		});
@@ -618,7 +616,7 @@ describe("/verify-pin-rfid", () => {
         .send()
 				.then(res => {
           console.log(res.body);
-					expect(res.status).to.equal(401, "error status 400");
+					expect(res.status).to.equal(400, "error status 400");
 					done();
 				});
 		});
@@ -635,13 +633,13 @@ describe("/verify-pin-rfid", () => {
         .send()
 				.then(res => {
           console.log(res.body);
-					expect(res.status).to.equal(404, "error status 404");
+					expect(res.status).to.equal(400, "error status 400");
 					done();
 				});
 		});
   });
 
-  describe("Check pin for existing user", () => {
+  describe("Check valid pin for existing user", () => {
 		it("should succeed", (done) => {
 
       addRandomCard(1, undefined, undefined, "12345").then(() => {
@@ -655,7 +653,6 @@ describe("/verify-pin-rfid", () => {
           .then(res => {
             console.log(res.body);
             expect(res.status).to.equal(200, "error status 200");
-            expect(res.body.valid).to.equal(true);
             done();
           });
         });
@@ -673,8 +670,7 @@ describe("/verify-pin-rfid", () => {
         .send()
 				.then(res => {
           console.log(res.body);
-          expect(res.status).to.equal(200, "error status 200");
-          expect(res.body.valid).to.equal(false);
+          expect(res.status).to.equal(400, "error status 400");
 					done();
 				});
 		});
