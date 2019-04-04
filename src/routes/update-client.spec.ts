@@ -5,9 +5,9 @@ import { RouteTestSuite } from './../classes/route-test-suite';
 new RouteTestSuite(new UpdateClientRoute())
 
   .add({
-    name: "Add cards when client is added",
+    name: "Add card when client is added",
     params: {
-      IDS: [exampleValidClientId],
+      ID: exampleValidClientId,
       Operation: "CREATE"
     },
     test: async (res, expect, db) => {
@@ -17,9 +17,9 @@ new RouteTestSuite(new UpdateClientRoute())
   })
 
   .add({
-    name: "Deactivate cards when client is removed",
+    name: "Deactivate card when client is removed",
     params: {
-      IDS: [exampleValidClientId],
+      ID: exampleValidClientId,
       Operation: "DELETE"
     },
     test: async (res, expect, db) => {
@@ -30,26 +30,26 @@ new RouteTestSuite(new UpdateClientRoute())
   })
 
   .add({
-    name: "Add cards when client is added 2",
+    name: "Add card when client is added 2",
     params: {
-      IDS: [exampleValidClientId, exampleValidClientId2],
+      ID: exampleValidClientId2,
       Operation: "CREATE"
     },
     test: async (res, expect, db) => {
       const users = await db.getAllClients();
-      expect(users.length).to.equal(6);
+      expect(users.length).to.equal(4);
     },
   })
 
   .add({
-    name: "Deactivate cards when client is removed 2",
+    name: "Deactivate card when client is removed 2",
     params: {
-      IDS: [exampleValidClientId, exampleValidClientId2],
+      ID: exampleValidClientId2,
       Operation: "DELETE"
     },
     test: async (res, expect, db) => {
       const users = await db.getAllClients();
-      expect(users.length).to.equal(6);
+      expect(users.length).to.equal(4);
       expect(users.every(user => user.isActivated == false)).to.equal(true);
     }
   })
@@ -57,12 +57,12 @@ new RouteTestSuite(new UpdateClientRoute())
   .add({
     name: "Add cards on subscribe, but don't add for existing clients",
     params: {
-      IDS: [exampleValidClientId, exampleValidClientId2, "123"],
+      ID: [exampleValidClientId, exampleValidClientId2, "123"],
       Operation: "subscribed"
     },
     test: async (res, expect, db) => {
       const users = await db.getAllClients();
-      expect(users.length).to.equal(8);
+      expect(users.length).to.equal(6);
     },
   })
 

@@ -21,10 +21,10 @@ export class UpdateClientRoute extends Route {
 
   parameters = [
     new RouteParam(
-      "IDS",
-      `["${exampleValidClientId}", "${exampleValidClientId2}"]`,
+      "ID",
+      `${exampleValidClientId} | ["${exampleValidClientId}", "${exampleValidClientId2}"]`,
       async val => {
-        return Array.isArray(val);
+        return val.length > 0;
       }
     ),
     new RouteParam(
@@ -38,14 +38,7 @@ export class UpdateClientRoute extends Route {
     To be called by Client Information System.`;
 
   exampleResponses = [
-    [
-      {
-        clientId: exampleValidClientId,
-        cardNumber: exampleValidCard,
-        rfid: exampleValidRfid,
-        pin: exampleValidPin
-      }
-    ],
+    {},
     {
       ...new ClientIdNotFoundException()
     }
@@ -58,36 +51,25 @@ export class UpdateClientRoute extends Route {
     console.log("SUBBING", isSubscribing);
 
     if (params.Operation == "DELETE") {
-      for (const id of params.IDS) {
-        await this.db.removeCard("clientId", id);
-      }
-    } else if (params.Operation == "CREATE" || isSubscribing) {
-      const res = [];
+      await this.db.removeCard("clientId", params.ID);
+    } else if (params.Operation == "CREATE") {
+      // create gives single id
+      await CardManager.createNewCard(params.ID);
+      await CardManager.createNewCard(params.ID, true);
+    } else if (isSubscribing) {
+      // subscribe gives list of ids
+      const existingCards = (await this.db.getAllClients())
+        .map(cardId => cardId.clientId)
+        .filter((cardId, index, arr) => arr.indexOf(cardId) == index);
 
-      const existingCards = isSubscribing
-        ? (await this.db.getAllClients())
-            .map(cardId => cardId.clientId)
-            .filter((cardId, index, arr) => arr.indexOf(cardId) == index)
-        : [];
-
-      const cards = params.IDS.filter(
+      const cards = params.ID.filter(
         cardId => existingCards.indexOf(cardId) == -1
       );
 
       for (const id of cards) {
-        res.push({
-          ...(await CardManager.createNewCard(id)),
-          clientId: id
-        });
-        res.push({
-          ...(await CardManager.createNewCard(id, true)),
-          clientId: id
-        });
+        await CardManager.createNewCard(id);
+        await CardManager.createNewCard(id, true);
       }
-
-      return {
-        cards: res
-      };
     }
   }
 }
