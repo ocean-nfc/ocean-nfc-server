@@ -7,17 +7,17 @@ export const isNumber = (value) => {
 export const clientIdValidator = async (clientId: string) => {
   return isNumber(clientId);
 }
-export const exampleValidClientId = "1";
-export const exampleValidClientId2 = "999";
+export const exampleValidClientId = "2011";
+export const exampleValidClientId2 = "2011";
 
 export const cardValidator = async (card: string) => {
   return CardManager.isCardNumberValid(card);
 }
 export const exampleValidCard = "4195659888767522";
-export const exampleValidCard2 = "4195662747483323";
+export const exampleValidCard2 = "4195655241274990";
 
 export const rfidValidator = async (rfid: string) => {
-  return isNumber(rfid) && rfid.length == 8;
+  return CardManager.isRfidNumberValid(rfid);
 }
 export const exampleValidRfid = "12345678";
 

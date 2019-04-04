@@ -1,10 +1,14 @@
 import { Database } from "./../classes/database";
 import { PinManager } from "./pin";
+import { Notifications } from "./notifications";
+
+const db = Database.getInstance();
 
 /**
  * This class is used to create, read, update and deactivate client's bank cards.
  */
 export class CardManager {
+
   /**
    * Array of valid FNB Credit Card BINs
    *
@@ -21,7 +25,9 @@ export class CardManager {
    *
    * @type string
    */
-  private static readonly FnbDebitCardBins: string[] = ["419570"];
+  private static readonly FnbDebitCardBins: string[] = [
+    "419570"
+  ];
 
   /**
    * Generates a new bank card and save it to the database with the client's ID.
@@ -30,24 +36,115 @@ export class CardManager {
    * @param credit - Credit card or not
    * @returns The new card number
    */
-  public static async createNewCard(clientID: string, hasRfid = false): Promise<{
+  public static async createNewCard(clientID: string, generateRfid = false): Promise<{
     cardNumber: string,
     rfid: string,
     pin: string
   }> {
     let number = await this.generateNewCard(Boolean(Math.round(Math.random())));
-    let rfid = hasRfid ? await this.generateRfIDNumber() : null;
+    let rfid = generateRfid ? await this.generateRfIDNumber() : null;
 
     const { pin, hash } = await PinManager.createNewPin();
-    let db = Database.getInstance();
 
-    await db.addCard(clientID, rfid, number, hash);
+    let message = "Your new card has just been created!<br><br>";
+    message += "Card Number: " + number + "<br>";
+    if (rfid) {
+      message += "RfID Number: " + rfid + "<br>";
+    }
+    message += "Pin Number: " + pin + "<br>";
 
-    return {
-      cardNumber: number,
-      rfid: rfid,
-      pin: pin
-    };
+    let success = await Notifications.notify(clientID, "New Bank Card", message);
+    if (success) {
+      await db.addCard(clientID, rfid, number, hash);
+      return {
+        cardNumber: number,
+        rfid: rfid,
+        pin: pin
+      };
+    } else {
+      return null;
+    }    
+  }
+
+  /**
+   * Deactivates a bank card by using the card's number and then notifies the client.
+   * 
+   * @param number - The number of the card
+   * @returns Whether or not it was deactivated
+   */
+  public static async deactivateCardByNumber(number: string): Promise<boolean> {
+    let card = await db.getByCardNumber(number);
+    if (!card) {
+      return false;
+    }
+    
+    let message = "One of your cards have been deactivated.<br><br>";
+    message += "Card Number: " + card.cardNumber + "<br>";
+    if (card.rfid) {
+      message += "RfID Number: " + card.rfid + "<br>";
+    }
+
+    let success = await Notifications.notify(card.clientId, "Card Deactivation", message);
+    if (success) {
+      await db.removeCard("cardNumber", number);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Deactivates a bank card by using the card's rfid number and then notifies the client.
+   * 
+   * @param number - The number of the card
+   * @returns Whether or not it was deactivated
+   */
+  public static async deactivateCardByRfID(rfid: string): Promise<boolean> {
+    let card = await db.getByRfid(rfid);
+    if (!card) {
+      return false;
+    }
+    
+    let message = "One of your cards have been deactivated.<br><br>";
+    message += "Card Number: " + card.cardNumber + "<br>";
+    message += "RfID Number: " + card.rfid + "<br>";
+
+    let success = await Notifications.notify(card.clientId, "Card Deactivation", message);
+    if (success) {
+      await db.removeCard("rfid", rfid);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Deactivates all of a client's bank cards and then notifies them.
+   * 
+   * @param clientID - The client who's cards need to be deactivated
+   * @returns Whether or not it was deactivated
+   */
+  public static async deactivateAllCards(clientID: string): Promise<boolean> {
+    let cards = await db.getClientCards(clientID);
+
+    let message = "All of your cards have been deactivated.<br><br>";
+    cards.forEach(card => {
+      if(card.isActivated){
+        message += "Card Number: " + card.cardNumber + "<br>";
+        if (card.rfid) {
+          message += "RfID Number: " + card.rfid + "<br>";
+        }
+        message += "<br>";
+      }
+    });
+
+    let success = await Notifications.notify(clientID, "Card Deactivation", message);
+    if (success) {
+      await db.removeCard("clientId", clientID);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -66,6 +163,22 @@ export class CardManager {
     if (!this.isFNBCardNumber(number)) {
       return false;
     }
+    return true;
+  }
+
+  /**
+   * Checks whether or not the bank card's rfid number is valid by performing a selection of tests.
+   * 
+   * @param rfid - The bank card's rfid number to check
+   * @returns Whether or not it's valid
+   */
+  public static isRfidNumberValid(rfid: string): boolean {
+    if (rfid.length != 8) {
+      return false;
+    }
+    /*if (!isNumber(rfid)) {
+      return false;
+    }*/
     return true;
   }
 
@@ -169,10 +282,7 @@ export class CardManager {
    * @returns Whether or not the card exists
    */
   private static async doesCardExist(number: string): Promise<boolean> {
-    const db = Database.getInstance();
-
     const card = await db.getClientIdByCardNumber(number);
-
     return card != null;
   }
 
@@ -189,7 +299,7 @@ export class CardManager {
       number = this.getBinNumber(credit);
 
       let min = 100000000;
-      let max = 999999999;
+      let max = 999999998;
       let random = Math.floor(Math.random() * max + min);
       number = number + random.toString();
       number = number + this.generateCheckDigit(number);
@@ -210,10 +320,7 @@ export class CardManager {
    * @returns Whether or not the card exists
    */
   private static async doesRfidExist(number: string): Promise<boolean> {
-    const db = Database.getInstance();
-
     const rfid = await db.getClientIdByRfid(number);
-
     return rfid != null;
   }
 
@@ -227,13 +334,17 @@ export class CardManager {
     let valid = false;
     while (!valid) {
       let min = 10000000;
-      let max = 99999999;
+      let max = 99999998;
       let random = Math.floor(Math.random() * max + min);
       number = random.toString();
 
-      let temp = await this.doesRfidExist(number);
-      valid = !temp;
+      valid = this.isRfidNumberValid(number);
+      if (valid) {
+        let temp = await this.doesRfidExist(number);
+        valid = !temp;
+      }
     }
     return number;
   }
+
 }
