@@ -1,26 +1,51 @@
 import * as axios from "axios";
-import { response } from "express";
 
+/**
+ * This class is used to interact with the Notifications system.
+ */
+export class Notifications {
+  
+  /**
+   * The url used to connect with the Notifications system.
+   *
+   * @type string
+   */
+  private static readonly url = "https://fnbsim.southafricanorth.cloudapp.azure.com";
 
-export class Notifications{
+  /**
+   * Sends a notification the the client specified.
+   * 
+   * @param clientID - The client to send the notificaiton to
+   * @param subject - The subject line for the notification
+   * @param message - The message of the notification
+   * @returns Whether or not the notification was sent
+   */
+  public static async notify(clientID: string, subject: string, message: string): Promise<boolean> {
+    let config = {
+      headers: {
+        "Content-Type": 'application/json'
+      }
+    };
 
-    private constructor() {}
+    let data = {
+      clientID : clientID,
+      subject : subject,
+      message : message
+    };
 
-    public static notify(clientId,subject,message){
+    let success = false;
 
-        axios.default
-        .post("https://fnbsim.southafricanorth.cloudapp.azure.com/notify", {
-        clientID : clientId,
-        subject : subject,
-        message : message
-      },{
-          headers : {
-            "Content-Type" : 'application/json'
-          }
-      }). then( (res) =>{
-          console.log("Notification Success - ",res.status," ",res.data);
-      }).catch(err => {
-        console.error("Notification Error - ",err.status," ",err.data);
-      });
-    }
+    await axios.default.post(this.url + "/notify", data, config)
+    .then(response =>{
+      if(response.status == 200){
+        success = true;
+      }
+    })
+    .catch(error => {
+      console.error("Notification Error - ", error.status, " ", error.data);
+      success = false;
+    });
+    return success;
+  }
+
 }

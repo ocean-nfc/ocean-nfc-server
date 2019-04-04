@@ -17,7 +17,7 @@ export const exampleValidCard = "4195659888767522";
 export const exampleValidCard2 = "4195662747483323";
 
 export const rfidValidator = async (rfid: string) => {
-  return isNumber(rfid) && rfid.length == 8;
+  return CardManager.isRfidNumberValid(rfid);
 }
 export const exampleValidRfid = "12345678";
 
