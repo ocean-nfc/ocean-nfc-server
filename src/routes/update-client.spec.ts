@@ -57,7 +57,7 @@ new RouteTestSuite(new UpdateClientRoute())
   .add({
     name: "Add cards on subscribe, but don't add for existing clients",
     params: {
-      ID: [exampleValidClientId, exampleValidClientId2, "123"],
+      ID: [exampleValidClientId + "1", exampleValidClientId2 + "2", "123"],
       Operation: "subscribed"
     },
     test: async (res, expect, db) => {

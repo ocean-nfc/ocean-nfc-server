@@ -1,4 +1,4 @@
-import { exampleValidCard, exampleValidClientId, exampleValidRfid } from './../classes/validators';
+import { exampleValidCard, exampleValidClientId, exampleValidRfid, exampleValidClientId2 } from './../classes/validators';
 import { RouteTestSuite } from '../classes/route-test-suite';
 import { AddCardRoute } from './add-card';
 
@@ -32,7 +32,7 @@ new RouteTestSuite(new AddCardRoute())
   .add({
     name: "Add card with different client id",
     params: {
-      clientId: "2",
+      clientId: exampleValidClientId2,
       cardNumber: exampleValidCard,
       rfid: exampleValidRfid,
       pin: "12345"
@@ -41,7 +41,7 @@ new RouteTestSuite(new AddCardRoute())
       expect(res.status).to.equal(200);
 
       try {
-        var cards = await db.getClientCards("2");
+        var cards = await db.getClientCards(exampleValidClientId2);
         console.log(cards);
       } catch (e) {
         console.error(e);

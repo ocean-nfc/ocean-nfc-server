@@ -48,8 +48,9 @@ new RouteTestSuite(new DeactByRfidRoute())
       rfid: "12121212"
     },
     test: async (res, expect, db) => {
-      expect(res.body.message).to.equal(
-        new ClientIdNotFoundException().message
+      expect(res.body).to.equal(
+        //new ClientIdNotFoundException().message
+        false
       );
     }
   })

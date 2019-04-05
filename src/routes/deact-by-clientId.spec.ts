@@ -47,11 +47,14 @@ new RouteTestSuite(new DeactByClientIdRoute())
   .add({
     name: "Deactivate non-existing clients card",
     params: {
-      clientId: "100"
+      clientId: "10000000"
     },
     test: async (res, expect, db) => {
-      expect(res.body.message).to.equal(
+      /*expect(res.body.message).to.equal(
         new ClientIdNotFoundException().message
+      );*/
+      expect(res.body).to.equal(
+        false
       );
     }
   })
