@@ -47,11 +47,15 @@ export class RouteTestSuite {
 
       after(done => {
         server.stop().then(done);
+        console.log("\n\n\n");
+        console.log("==========================================");
+        console.log("\n\n\n");
       });
 
       for (const test of this.tests) {
         it(test.name, done => {
           (async () => {
+            console.log('\n--------------------------\n');
             if (test.preamble) await test.preamble(Database.getInstance());
 
             const res = await RouteTestSuite.request(this.route, test.params);
