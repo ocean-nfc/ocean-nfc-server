@@ -3,4 +3,4 @@ node_js:
   "node"
 cache: npm
 env:
-  - NODE_ENV=development
+  - NODE_ENV=development NOTIFY=no

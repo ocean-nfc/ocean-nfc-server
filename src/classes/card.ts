@@ -139,6 +139,7 @@ export class CardManager {
     });
 
     let success = await Notifications.notify(clientID, "Card Deactivation", message);
+    console.log("deactivate all cards success", success);
     if (success) {
       await db.removeCard("clientId", clientID);
       return true;

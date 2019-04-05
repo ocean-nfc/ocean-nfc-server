@@ -62,9 +62,11 @@ export class UpdateClientRoute extends Route {
         .map(cardId => cardId.clientId)
         .filter((cardId, index, arr) => arr.indexOf(cardId) == index);
 
+      console.log("existing cards", existingCards);
       const cards = params.ID.filter(
         cardId => existingCards.indexOf(cardId) == -1
       );
+      console.log("cards", cards);
 
       for (const id of cards) {
         await CardManager.createNewCard(id);

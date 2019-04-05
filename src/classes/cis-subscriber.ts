@@ -15,7 +15,7 @@ export class CISSubscriber {
     setInterval(async () => {
       const res = await CISSubscriber.subscribeRequest();
       console.log(res.data);
-    }, 10 * 60 * 1000);
+    }, 20 * 60 * 1000);
   }
 
   private static subscribeRequest() {

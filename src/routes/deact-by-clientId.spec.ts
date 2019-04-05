@@ -50,11 +50,8 @@ new RouteTestSuite(new DeactByClientIdRoute())
       clientId: "10000000"
     },
     test: async (res, expect, db) => {
-      /*expect(res.body.message).to.equal(
+      expect(res.body.message).to.equal(
         new ClientIdNotFoundException().message
-      );*/
-      expect(res.body).to.equal(
-        false
       );
     }
   })
